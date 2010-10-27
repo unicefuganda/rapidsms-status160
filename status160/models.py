@@ -18,7 +18,7 @@ class Comments(models.Model):
     def __unicode__(self):
         return self.text
 
-class WardenRelationship(Contact):
+class WardenRelationship(models.Model):
     """
     Wardens are responsible for managing a contact list and ensuring
     the people on it are safe.  This creates a tree structure (or
