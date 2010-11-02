@@ -1,0 +1,17 @@
+<table>
+    <tr>
+        <td>
+            <label for="id_text">Type your message here:
+            {{ masstextform.text }}
+        </td>
+        <td>
+            {{ masstextform.text.errors }}
+        </td>
+        <td>
+            <input type="button" value="send to selected" onclick="submitForm(this, '../masstext/send/', $('#messageform'))"/>
+        </td>
+        <td>
+            <a href="javascript:void(0)" onclick="$('#messageform').hide()">cancel</a>
+        </td>
+    </tr>
+</table>

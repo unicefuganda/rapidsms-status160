@@ -1,0 +1,40 @@
+{% load status %}
+{% load warden %}
+{% load comments %}
+{% load lastmessage %}
+{% load lastpoll %}
+<td>
+{{ form.name }}
+</td>
+<td>
+{{ form.teams }}
+</td>
+<td>
+{{ form.agencies }}    
+</td>
+<td>
+{{ form.location }}
+</td>
+<td>
+</td>
+<td style="background-color:#{{ contact|status:"color" }}">
+    {{ form.status }}
+</td>
+<td>
+    {{ form.warden }}
+</td>
+<td>
+    {{ form.comments }}
+</td>
+<td>
+</td>
+<td class="button_col">
+    <div class="buttons">
+        <a href="javascript:void(0)" onclick="$('#row_{{ contact.pk }}').load('../contacts/{{ contact.pk }}/view/')">
+            <img src="{{ MEDIA_URL }}rapidsms/icons/silk/decline.png" />
+        </a>
+        <a href="javascript:void(0)" onclick="submitForm(this, '../contacts/{{ contact.pk }}/edit/', $('#row_{{ contact.pk }}'))">
+            <img src="{{ MEDIA_URL }}rapidsms/icons/silk/accept.png" />
+        </a>        
+    </div>
+</td>

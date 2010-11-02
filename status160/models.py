@@ -11,7 +11,7 @@ class Comments(models.Model):
     Blaster allows people to add comments to a user's status regarding
     a particular security event
     """
-    event = models.ForeignKey(Poll)
+    event = models.ForeignKey(Poll, related_name='comments')
     user = models.ForeignKey(Contact)
     text = models.CharField(max_length=2000)
     
