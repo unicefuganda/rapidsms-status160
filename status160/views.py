@@ -5,10 +5,10 @@ from django.template import RequestContext
 from django.shortcuts import redirect, get_object_or_404, render_to_response
 from django.conf import settings
 from django import forms
+from django.forms.util import ErrorList
 from django.core.exceptions import ValidationError
 from django.http import HttpResponse
 from django.views.decorators.csrf import csrf_exempt
-
 from operator import itemgetter
 from rapidsms.models import Contact, Connection, ConnectionBase
 from .models import WardenRelationship, Team, Agency, Alert, Comments
@@ -40,7 +40,6 @@ class ContactsForm(forms.Form):
     contacts = forms.ModelMultipleChoiceField(queryset=Contact.objects.all(), widget=forms.CheckboxSelectMultiple())
 
 def index(request):
-# tuples are column, display, sorting, aggregate
     masstextform = MassTextForm()
     createventform = CreateEventForm()
     selected = False
@@ -78,6 +77,7 @@ def whitelist(request):
 
 @require_POST
 def new_event(request):
+    response = None
     if request.method == 'POST':
         form = CreateEventForm(request.POST)
         contacts_form = ContactsForm(request.POST)
@@ -117,14 +117,20 @@ def new_event(request):
                 priority=3
             )
             poll.start()
+            print "sending a response"
+            response = "Event created, messages sent!"
             form = CreateEventForm()
+        elif not contacts_form.is_valid():
+            form.errors.setdefault('short_description', ErrorList())
+            form.errors['short_description'].append('A status survey must have contacts.')
         
     else:
         form = CreateEventForm()
-    return render_to_response("status160/event.html", {'createeventform':form},context_instance=RequestContext(request))    
+    return render_to_response("status160/event.html", {'createeventform':form, 'response':response},context_instance=RequestContext(request))    
 
 @require_POST
 def send_masstext(request):
+    response = None
     if request.method == 'POST':
         form = MassTextForm(request.POST)
         contacts_form = ContactsForm(request.POST)
@@ -134,10 +140,14 @@ def send_masstext(request):
             for conn in connections:
                 outgoing = OutgoingMessage(conn, form.cleaned_data['text'])
                 router.handle_outgoing(outgoing)
+            response = "Messages Sent!"
             form = MassTextForm()
+        elif not contacts_form.is_valid():
+            form.errors.setdefault('text', ErrorList())
+            form.errors['text'].append('A set of recipients is required.')            
     else:
         form = MassTextForm()
-    return render_to_response("status160/masstext.html", {'masstextform':form},context_instance=RequestContext(request))
+    return render_to_response("status160/masstext.html", {'masstextform':form, 'response':response},context_instance=RequestContext(request))
 
 @require_POST
 def send_alerts(request):
@@ -150,7 +160,7 @@ def send_alerts(request):
         
         # don't spam like crazy
         if (total_seconds < 900):
-            return HttpResponse(status=400)   
+            return HttpResponse(content='<span style="color:red">An alert was sent in the past 15 minutes, please try later.</span>', status=200)   
     except Alert.DoesNotExist:
         # first alert can be sent whenever
         pass
@@ -193,7 +203,7 @@ def send_alerts(request):
                 outgoing = OutgoingMessage(conn, smstext)
                 router.handle_outgoing(outgoing)
 
-    return HttpResponse(status=200)
+    return HttpResponse(content='<span style="color:green">Alerts Sent!</span>', status=200)
 
 @require_POST
 def delete_contact(request, contact_id):
@@ -208,7 +218,7 @@ class EditContactForm(forms.Form): # pragma: no cover
     teams = forms.ModelMultipleChoiceField(queryset=Team.objects.all().order_by('name'), required=False)
     agencies = forms.ModelMultipleChoiceField(queryset=Agency.objects.all().order_by('name'), required=False)
     location = forms.ModelChoiceField(queryset=Area.objects.all(), required=False)
-    comments = forms.CharField(max_length=2000, required=False, widget=forms.Textarea(attrs={'cols': 30, 'rows': 2}))
+    comments = forms.CharField(max_length=2000, required=False, widget=forms.Textarea(attrs={'rows': 2}))
     
     def __init__(self, data=None, **kwargs):
         kwargs.setdefault('poll', None)

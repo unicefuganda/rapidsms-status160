@@ -3,45 +3,46 @@
 {% load comments %}
 {% load lastmessage %}
 {% load lastpoll %}
-<td>
-<input {% if selected %}checked="true"{% endif %} type="checkbox" onclick="$('#id_select_all').attr('checked', false)" name="contacts" value="{{ contact.pk }}"/>
-{{ contact.name }}
+<td class="name_col">
+    <input {% if selected %}checked="true"{% endif %} type="checkbox" onclick="$('#id_select_all').attr('checked', false)" name="contacts" value="{{ contact.pk }}"/>
+    {{ contact.name }}
+    <br clear="left"/>
     <div id="connections_{{ contact.pk }}">
         {% include "status160/connection_view.html" %}
     </div>
 </td>
-<td>
+<td class="team_col">
 {% for group in contact.groups.all %}
     {% if group.team %}
       {{ group.name }}
     {% endif %}
 {% endfor %}
 </td>
-<td>
+<td class="agency_col">
 {% for group in contact.groups.all %}
     {% if group.agency %}
       {{ group.name }}
     {% endif %}
 {% endfor %}    
 </td>
-<td>
+<td class="location_col">
 {{ contact.reporting_location.name }}
 </td>
-<td>
+<td class="event_col">
 {{ contact|lastpoll:"name" }}
 </td>
-<td style="background-color:#{{ contact|status:"color" }}">
+<td style="background-color:#{{ contact|status:"color" }}" class="status_col">
     {{ contact|status:"name" }}
 </td>
-<td>
+<td class="warden_col">
 {{ contact|warden }}
 </td>
-<td>
+<td class="comments_col">
     {% for comment in contact|comments %}
         {{ comment.text }}
     {% endfor %}
 </td>
-<td>
+<td class="message_col">
 {{ contact|lastmessage }}
 </td>
 <td class="button_col">

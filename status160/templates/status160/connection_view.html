@@ -1,5 +1,6 @@
 {% for connection in contact.connection_set.all %}
     <a href="javascript:void(0)" onclick="$('#connections_{{ contact.pk }}_edit').load('../connections/{{ connection.pk }}/edit/')">{{ connection.identity }}</a>
+    <br clear="left"/>
 {% endfor %}
 <a class="small" href="javascript:void(0)" onclick="$('#connections_{{ contact.pk }}_edit').load('../connections/{{ contact.pk }}/add/')">add</a>
 <div id="connections_{{ contact.pk }}_edit">

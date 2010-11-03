@@ -3,30 +3,58 @@
 {% load comments %}
 {% load lastmessage %}
 {% load lastpoll %}
-<td>
-{{ form.name }}
+<td class="name_col">
+    {{ form.name }}
+    {% if form.name.errors %}
+        <br clear="left"/>
+        {{ form.name.errors }}
+    {% endif %}
 </td>
-<td>
-{{ form.teams }}
+<td class="team_col">
+    {{ form.teams }}
+    {% if form.teams.errors %}
+        <br clear="left"/>
+        {{ form.teams.errors }}
+    {% endif %}    
 </td>
-<td>
-{{ form.agencies }}    
+<td class="agency_col">
+    {{ form.agencies }}
+    {% if form.agencies.errors %}
+        <br clear="left"/>
+        {{ form.agencies.errors }}
+    {% endif %}
 </td>
-<td>
-{{ form.location }}
+<td class="location_col">
+    {{ form.location }}
+    {% if form.location.errors %}
+        <br clear="left"/>
+        {{ form.location.errors }}
+    {% endif %}    
 </td>
-<td>
+<td class="event_col">
 </td>
-<td style="background-color:#{{ contact|status:"color" }}">
+<td style="background-color:#{{ contact|status:"color" }}" class="status_col">
     {{ form.status }}
+    {% if form.status.errors %}
+        <br clear="left"/>
+        {{ form.status.errors }}
+    {% endif %}    
 </td>
-<td>
+<td class="warden_col">
     {{ form.warden }}
+    {% if form.warden.errors %}
+        <br clear="left"/>
+        {{ form.warden.errors }}
+    {% endif %}    
 </td>
-<td>
+<td class="comments_col">
     {{ form.comments }}
+    {% if form.comments.errors %}
+        <br clear="left"/>
+        {{ form.comments.errors }}
+    {% endif %}    
 </td>
-<td>
+<td class="message_col">
 </td>
 <td class="button_col">
     <div class="buttons">

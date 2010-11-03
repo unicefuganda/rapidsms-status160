@@ -1,4 +1,13 @@
 <table>
+{% if response %}
+    <tr>
+        <td colspan="4">
+            <span style="color:green">
+                {{ response }}
+            </span>
+        </td>
+    </tr>
+{% endif %}
     <tr>
         <td>
             <label for="id_text">Type your message here:
