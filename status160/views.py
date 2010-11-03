@@ -253,7 +253,10 @@ class EditContactForm(forms.Form): # pragma: no cover
 
 def edit_contact(request, contact_id):
     contact = get_object_or_404(Contact, pk=contact_id)
-    poll = Poll.objects.filter(contacts=contact).exclude(start_date=None).filter(Q(end_date=None) | (~Q(end_date=None) & Q(end_date__gt=datetime.datetime.now()))).latest('start_date')
+    try:
+        poll = Poll.objects.filter(contacts=contact).exclude(start_date=None).filter(Q(end_date=None) | (~Q(end_date=None) & Q(end_date__gt=datetime.datetime.now()))).latest('start_date')
+    except Poll.DoesNotExist:
+        poll = None
     if request.method == 'POST':
         contact_form = EditContactForm(request.POST, poll=poll, contact=contact)
         if contact_form.is_valid():
@@ -267,22 +270,23 @@ def edit_contact(request, contact_id):
             for a in contact_form.cleaned_data['agencies']:
                 contact.groups.add(a)
             contact.reporting_location = contact_form.cleaned_data['location']
-            if poll.comments.filter(user=contact).count():
-                comments = poll.comments.filter(user=contact)[0]
-                comments.text = contact_form.cleaned_data['comments']
-                comments.save()
-            else:
-                comments = Comments.objects.create(event=poll, user=contact, text=contact_form.cleaned_data['comments'])
+            if poll:
+                if poll.comments.filter(user=contact).count():
+                    comments = poll.comments.filter(user=contact)[0]
+                    comments.text = contact_form.cleaned_data['comments']
+                    comments.save()
+                else:
+                    comments = Comments.objects.create(event=poll, user=contact, text=contact_form.cleaned_data['comments'])
+                status = contact_form.cleaned_data['status']
+                if Response.objects.filter(poll=poll, message__connection__contact=contact).count():
+                    r = Response.objects.filter(poll=poll, message__connection__contact=contact).latest('message__date')
+                    r.categories.add(ResponseCategory.objects.create(response=r, is_override=True, user=request.user, category=status))
+                else:
+                    m = Message.objects.create(connection=contact.default_connection, text='Status override from web', status='C', direction='I')
+                    r = Response.objects.create(message=m, poll=poll)
+                    r.categories.add(ResponseCategory.objects.create(response=r, is_override=True, user=request.user, category=status))                    
             contact.save()
-            status = contact_form.cleaned_data['status']
-            if Response.objects.filter(poll=poll, message__connection__contact=contact).count():
-                r = Response.objects.filter(poll=poll, message__connection__contact=contact).latest('message__date')
-                r.categories.add(ResponseCategory.objects.create(response=r, is_override=True, user=request.user, category=status))
-            else:
-                m = Message.objects.create(connection=contact.default_connection, text='Status override from web', status='C', direction='I')
-                r = Response.objects.create(message=m, poll=poll)
-                r.categories.add(ResponseCategory.objects.create(response=r, is_override=True, user=request.user, category=status))
-            
+
             return render_to_response("status160/contact_row_view.html", {'contact':contact})
         else:
             return render_to_response("status160/contact_row_edit.html", {'contact':contact, 'form':contact_form},context_instance=RequestContext(request))    
