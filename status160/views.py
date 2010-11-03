@@ -307,9 +307,13 @@ def edit_contact(request, contact_id):
                     teams.append(g.team)
                 except Team.DoesNotExist:
                     pass
+        if contact.charges.count():
+            warden = contact.charges.all()[0].warden
+        else:
+            warden = None
         contact_form = EditContactForm({
             'name':contact.name,
-            'warden': contact.charges.all()[0].warden,
+            'warden': warden,
             'teams': teams,
             'agencies': agencies,
             'location': contact.reporting_location,
