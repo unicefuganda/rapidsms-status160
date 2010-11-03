@@ -265,9 +265,6 @@ def edit_contact(request, contact_id):
             if contact_form.cleaned_data['warden']:
                 wardenrel = WardenRelationship.objects.get(warden=contact_form.cleaned_data['warden'])
                 wardenrel.dependents.add(contact)
-            wardenrel = contact.charges.all()[0]
-            wardenrel.warden = contact_form.cleaned_data['warden']
-            wardenrel.save()
             contact.groups.clear()
             for t in contact_form.cleaned_data['teams']:
                 contact.groups.add(t)
