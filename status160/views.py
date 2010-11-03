@@ -27,6 +27,7 @@ class FilterContactForm(forms.Form): # pragma: no cover
     wardens = forms.ModelMultipleChoiceField(queryset=Contact.objects.filter(pk__in=WardenRelationship.objects.all().values_list('warden', flat=True)).order_by('name'), required=False)
     teams = forms.ModelMultipleChoiceField(queryset=Team.objects.all().order_by('name'), required=False)
     agencies = forms.ModelMultipleChoiceField(queryset=Agency.objects.all().order_by('name'), required=False)
+    locations = forms.ModelMultipleChoiceField(queryset=Area.objects.all().order_by('name'), required=False)
     search_string = forms.CharField(max_length=1000, required=False)
     
 class MassTextForm(forms.Form):
@@ -49,8 +50,10 @@ def index(request):
             wardens = form.cleaned_data['wardens']
             teams = form.cleaned_data['teams']
             agencies = form.cleaned_data['agencies']
+            locations = form.cleaned_data['locations']
             search_string = form.cleaned_data['search_string']
-            contacts = _filter_contacts(wardens, teams, agencies, search_string)
+
+            contacts = _filter_contacts(wardens, teams, agencies, locations, search_string)
             selected = True
         else:
             # no required fields, invalid field means something funky happened
@@ -347,7 +350,7 @@ def view_connections(request, contact_id):
     contact = get_object_or_404(Contact, pk=contact_id)
     return render_to_response("status160/connection_view.html", {'contact':contact},context_instance=RequestContext(request))
 
-def _filter_contacts(wardens, teams, agencies, search_string):
+def _filter_contacts(wardens, teams, agencies, locations, search_string):
     contacts = Contact.objects.all()
     query = None
     if len(wardens):
@@ -361,4 +364,18 @@ def _filter_contacts(wardens, teams, agencies, search_string):
         contacts = contacts.filter(groups__in=teams)
     if len(agencies):
         contacts = contacts.filter(groups__in=agencies)
+    if len(locations):
+        contacts = contacts.filter(reporting_location__in=locations)
+    if search_string:
+            pks = []
+            # split terms if the "OR" operator is used
+            terms = [term.strip() for term in search_string.lower().split(' or ')]        
+            return contacts.filter(
+                (reduce(
+                    lambda x, y: x | y,
+                    [(Q(name__icontains=term) |
+                      Q(groups__name__icontains=term))
+                     for term in terms]
+                ))).distinct()
+
     return contacts

@@ -32,7 +32,13 @@
             {{ form.agencies }}
         </td>
         <td>
+            <label for="id_locations">Show locations:</label>
+            <br clear="left"/>
+            {{ form.locations }}
+        </td>
+        <td>
             <label for="id_search_string">Free-form search:</label>
+            <span class="small note">Use 'or' to search for multiple names</span>
             <br clear="left"/>
             {{ form.search_string }}
         </td>

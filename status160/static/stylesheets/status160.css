@@ -1,5 +1,6 @@
-#id_wardens, #id_agencies, #id_teams {
+#id_wardens, #id_agencies, #id_teams, #id_locations {
     height: 100px;
+    width: 100px;
     margin-top: 2px;
 }
 
