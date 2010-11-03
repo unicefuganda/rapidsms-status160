@@ -229,13 +229,14 @@ class EditContactForm(forms.Form): # pragma: no cover
         kwargs.setdefault('contact', None)
         contact = kwargs.pop('contact')
         if data:
-            if poll.comments.filter(user=contact).count():
-                # if this is from a POST, the dictionary is immutable
-                # and won't like being updated
-                try:
-                    data.update({'comments':poll.comments.filter(user=contact)[0].text})
-                except:
-                    pass
+            if poll:
+                if poll.comments.filter(user=contact).count():
+                    # if this is from a POST, the dictionary is immutable
+                    # and won't like being updated
+                    try:
+                        data.update({'comments':poll.comments.filter(user=contact)[0].text})
+                    except:
+                        pass
             forms.Form.__init__(self, data, **kwargs)
         else:
             forms.Form.__init__(self, **kwargs)
@@ -261,6 +262,9 @@ def edit_contact(request, contact_id):
         contact_form = EditContactForm(request.POST, poll=poll, contact=contact)
         if contact_form.is_valid():
             contact.name = contact_form.cleaned_data['name']
+            if contact_form.cleaned_data['warden']:
+                wardenrel = WardenRelationship.objects.get(warden=contact_form.cleaned_data['warden'])
+                wardenrel.dependents.add(contact)
             wardenrel = contact.charges.all()[0]
             wardenrel.warden = contact_form.cleaned_data['warden']
             wardenrel.save()
