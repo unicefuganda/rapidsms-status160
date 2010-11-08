@@ -4,41 +4,17 @@ from django.views.decorators.http import require_GET, require_POST
 from django.template import RequestContext
 from django.shortcuts import redirect, get_object_or_404, render_to_response
 from django.conf import settings
-from django import forms
 from django.forms.util import ErrorList
 from django.core.exceptions import ValidationError
 from django.http import HttpResponse
-from django.views.decorators.csrf import csrf_exempt
-from operator import itemgetter
-from rapidsms.models import Contact, Connection, ConnectionBase
+from rapidsms.models import Contact, Connection
 from .models import WardenRelationship, Team, Agency, Alert, Comments
 from simple_locations.models import Area
-from poll.models import Poll, Category, ResponseCategory, Response
-from django.contrib.sites.models import Site
-from rapidsms_httprouter.router import get_router
+from poll.models import Poll, ResponseCategory, Response
 from rapidsms_httprouter.models import Message
-from rapidsms.messages.outgoing import OutgoingMessage
-from djtables import Table, Column
-from status160.templatetags.status import status
 import datetime
-
-class FilterContactForm(forms.Form): # pragma: no cover
-    
-    wardens = forms.ModelMultipleChoiceField(queryset=Contact.objects.filter(pk__in=WardenRelationship.objects.all().values_list('warden', flat=True)).order_by('name'), required=False)
-    teams = forms.ModelMultipleChoiceField(queryset=Team.objects.all().order_by('name'), required=False)
-    agencies = forms.ModelMultipleChoiceField(queryset=Agency.objects.all().order_by('name'), required=False)
-    locations = forms.ModelMultipleChoiceField(queryset=Area.objects.all().order_by('name'), required=False)
-    search_string = forms.CharField(max_length=1000, required=False)
-    
-class MassTextForm(forms.Form):
-    text = forms.CharField(max_length=160, required=True)
-    
-class CreateEventForm(forms.Form):
-    short_description = forms.CharField(max_length=32, required=True)
-    text_question = forms.CharField(max_length=160, required=True)
-
-class ContactsForm(forms.Form):
-    contacts = forms.ModelMultipleChoiceField(queryset=Contact.objects.all(), widget=forms.CheckboxSelectMultiple())
+from .forms import FilterContactForm, MassTextForm, CreateEventForm, ContactsForm, EditContactForm, ConnectionForm
+from .utils import create_status_survey, send_mass_text, send_alert, filter_contacts
 
 def index(request):
     masstextform = MassTextForm()
@@ -53,7 +29,7 @@ def index(request):
             locations = form.cleaned_data['locations']
             search_string = form.cleaned_data['search_string']
 
-            contacts = _filter_contacts(wardens, teams, agencies, locations, search_string)
+            contacts = filter_contacts(wardens, teams, agencies, locations, search_string)
             selected = True
         else:
             # no required fields, invalid field means something funky happened
@@ -70,7 +46,6 @@ def index(request):
                  'selected': selected,
                  }, RequestContext(request)) 
 
-
 def whitelist(request):
     return render_to_response(
     "status160/whitelist.txt", 
@@ -86,41 +61,11 @@ def new_event(request):
         contacts_form = ContactsForm(request.POST)
         if form.is_valid() and contacts_form.is_valid():
             contacts = contacts_form.cleaned_data['contacts']
-            poll = Poll.create_yesno(
-                 form.cleaned_data['short_description'],
-                 form.cleaned_data['text_question'],
-                 '',
-                 contacts,
-                 request.user
-            )
-            poll.sites.add(Site.objects.get_current())
-            yes_category = poll.categories.get(name='yes')
-            yes_category.name = 'safe'
-            yes_category.response = "We received your response as 'yes',please send any updates to the system if your situation changes or you have useful information to provide." 
-            yes_category.priority = 4
-            yes_category.color = '99ff77'
-            yes_category.save()
-            no_category = poll.categories.get(name='no')
-            no_category.response = "We received your response as 'no',please send any updates to the system if your situation changes or you have useful information to provide."
-            no_category.name = 'unsafe' 
-            no_category.priority = 1
-            no_category.color = 'ff9977'
-            no_category.save()            
-            unknown_category = poll.categories.get(name='unknown')
-            unknown_category.default = False
-            unknown_category.priority = 2
-            unknown_category.color = 'ffff77'
-            unknown_category.save()
-            unclear_category = Category.objects.create(
-                poll=poll,
-                name='unclear',
-                default=True,
-                color='ffff77',
-                response='We have recorded but did not understand your response,please repeat (with a yes or no response)',
-                priority=3
-            )
-            poll.start()
-            print "sending a response"
+            poll = create_status_survey(
+                form.cleaned_data['short_description'],
+                form.cleaned_data['text_question'], 
+                contacts, 
+                request.user)
             response = "Event created, messages sent!"
             form = CreateEventForm()
         elif not contacts_form.is_valid():
@@ -138,11 +83,7 @@ def send_masstext(request):
         form = MassTextForm(request.POST)
         contacts_form = ContactsForm(request.POST)
         if form.is_valid() and contacts_form.is_valid():
-            connections = Connection.objects.filter(contact__in=contacts_form.cleaned_data['contacts']).distinct()
-            router = get_router()
-            for conn in connections:
-                outgoing = OutgoingMessage(conn, form.cleaned_data['text'])
-                router.handle_outgoing(outgoing)
+            send_mass_text(contacts_form.cleaned_data['contacts'], form.cleaned_data['text'])
             response = "Messages Sent!"
             form = MassTextForm()
         elif not contacts_form.is_valid():
@@ -167,44 +108,8 @@ def send_alerts(request):
     except Alert.DoesNotExist:
         # first alert can be sent whenever
         pass
-        
-    alert = Alert()
-    alert.save()
-    
-    for warden in WardenRelationship.objects.all():
-        outstanding = []
-        for dependent in warden.dependents.all():
-            status_num = status(dependent, 'number')
-            if int(status_num) < 3:
-                outstanding.append((dependent, status_num))
-                
-        if (len(outstanding)):
-            outstanding = sorted(outstanding, key=itemgetter(1), reverse=True)
-            smstext = "%s persons still unaccounted for/unsafe:" % str(len(outstanding))
-            text = smstext
-            toadd = ''
-            off = 0
-            while (len(text) < 476) and (off < len(outstanding)):
-                smstext = text
-                if outstanding[off][0].default_connection:
-                    
-                    text += "%s(%s)" % (outstanding[off][0].name, outstanding[off][0].default_connection.identity)
-                else:
-                    text +="%s" % outstanding[off][0].name
-                if off < (len(outstanding) - 1):
-                    text += ','
-                off += 1
-    
-            if off == len(outstanding) and len(text) < 476:
-                smstext = text
-            if off < len(outstanding):
-                smstext += '...'
-            print "sending '%s'" % smstext
 
-            router = get_router()
-            for conn in Connection.objects.filter(contact=warden.warden):
-                outgoing = OutgoingMessage(conn, smstext)
-                router.handle_outgoing(outgoing)
+    send_alert()
 
     return HttpResponse(content='<span style="color:green">Alerts Sent!</span>', status=200)
 
@@ -213,44 +118,6 @@ def delete_contact(request, contact_id):
     contact = get_object_or_404(Contact, pk=contact_id)
     contact.delete()
     return HttpResponse(status=200)
-
-class EditContactForm(forms.Form): # pragma: no cover
-    
-    name = forms.CharField(max_length=100, required=True)
-    warden = forms.ModelChoiceField(queryset=Contact.objects.filter(pk__in=WardenRelationship.objects.all().values_list('warden', flat=True)).order_by('name'), required=False)
-    teams = forms.ModelMultipleChoiceField(queryset=Team.objects.all().order_by('name'), required=False)
-    agencies = forms.ModelMultipleChoiceField(queryset=Agency.objects.all().order_by('name'), required=False)
-    location = forms.ModelChoiceField(queryset=Area.objects.all(), required=False)
-    comments = forms.CharField(max_length=2000, required=False, widget=forms.Textarea(attrs={'rows': 2}))
-    
-    def __init__(self, data=None, **kwargs):
-        kwargs.setdefault('poll', None)
-        poll = kwargs.pop('poll')
-        kwargs.setdefault('contact', None)
-        contact = kwargs.pop('contact')
-        if data:
-            if poll:
-                if poll.comments.filter(user=contact).count():
-                    # if this is from a POST, the dictionary is immutable
-                    # and won't like being updated
-                    try:
-                        data.update({'comments':poll.comments.filter(user=contact)[0].text})
-                    except:
-                        pass
-            forms.Form.__init__(self, data, **kwargs)
-        else:
-            forms.Form.__init__(self, **kwargs)
-        if poll:
-            initial_category = poll.categories.get(name='unknown')  
-            try:
-                r = ResponseCategory.objects.filter(response__poll=poll, response__message__connection__contact=contact, is_override=True).latest('response__message__date')
-                initial_category = r.category
-            except ResponseCategory.DoesNotExist:
-                try:
-                    r = ResponseCategory.objects.filter(response__poll=poll, response__message__connection__contact=contact).latest('response__message__date')
-                except ResponseCategory.DoesNotExist:
-                    pass
-            self.fields['status'] = forms.ModelChoiceField(required=True, queryset=poll.categories.all(), initial=initial_category) 
 
 def edit_contact(request, contact_id):
     contact = get_object_or_404(Contact, pk=contact_id)
@@ -279,13 +146,9 @@ def edit_contact(request, contact_id):
                 else:
                     comments = Comments.objects.create(event=poll, user=contact, text=contact_form.cleaned_data['comments'])
                 status = contact_form.cleaned_data['status']
-                if Response.objects.filter(poll=poll, message__connection__contact=contact).count():
-                    r = Response.objects.filter(poll=poll, message__connection__contact=contact).latest('message__date')
-                    r.categories.add(ResponseCategory.objects.create(response=r, is_override=True, user=request.user, category=status))
-                else:
-                    m = Message.objects.create(connection=contact.default_connection, text='Status override from web', status='C', direction='I')
-                    r = Response.objects.create(message=m, poll=poll)
-                    r.categories.add(ResponseCategory.objects.create(response=r, is_override=True, user=request.user, category=status))                    
+                response = Response.objects.create(contact=contact,poll=poll)
+                response.save()
+                response.categories.add(ResponseCategory.objects.create(response=response, is_override=True, user=request.user, category=status))
             contact.save()
 
             return render_to_response("status160/contact_row_view.html", {'contact':contact})
@@ -321,15 +184,9 @@ def edit_contact(request, contact_id):
         }, poll=poll, contact=contact)
         return render_to_response("status160/contact_row_edit.html", {'contact':contact, 'form':contact_form},context_instance=RequestContext(request))
 
-
 def view_contact(request, contact_id):
     contact = get_object_or_404(Contact, pk=contact_id)
     return render_to_response("status160/contact_row_view.html", {'contact':contact },RequestContext(request))
-
-class ConnectionForm(forms.ModelForm): # pragma: no cover
-    class Meta:
-        model = Connection
-        fields = ('identity','backend',)
 
 def edit_connection(request, connection_id):
     connection = get_object_or_404(Connection, pk=connection_id)
@@ -359,32 +216,3 @@ def view_connections(request, contact_id):
     contact = get_object_or_404(Contact, pk=contact_id)
     return render_to_response("status160/connection_view.html", {'contact':contact},context_instance=RequestContext(request))
 
-def _filter_contacts(wardens, teams, agencies, locations, search_string):
-    contacts = Contact.objects.all()
-    query = None
-    if len(wardens):
-        for warden in wardens:
-            if query:
-                query = query | Q(pk__in=WardenRelationship.objects.get(warden=warden).dependents.all()) 
-            else:
-                query = Q(pk__in=WardenRelationship.objects.get(warden=warden).dependents.all())
-        contacts = contacts.filter(query)
-    if len(teams):
-        contacts = contacts.filter(groups__in=teams)
-    if len(agencies):
-        contacts = contacts.filter(groups__in=agencies)
-    if len(locations):
-        contacts = contacts.filter(reporting_location__in=locations)
-    if search_string:
-            pks = []
-            # split terms if the "OR" operator is used
-            terms = [term.strip() for term in search_string.lower().split(' or ')]        
-            return contacts.filter(
-                (reduce(
-                    lambda x, y: x | y,
-                    [(Q(name__icontains=term) |
-                      Q(groups__name__icontains=term))
-                     for term in terms]
-                ))).distinct()
-
-    return contacts

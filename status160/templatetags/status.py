@@ -6,33 +6,46 @@ import datetime
 def status(contact, property):
     try:
         poll = Poll.objects.filter(contacts=contact).exclude(start_date=None).filter(Q(end_date=None) | (~Q(end_date=None) & Q(end_date__gt=datetime.datetime.now()))).latest('start_date')
+        response = None
+        user_override_response = None
         try:
-            r = ResponseCategory.objects.filter(is_override=True, response__poll=poll, response__message__connection__contact=contact).latest('response__message__date')
+            user_override_response = ResponseCategory.objects.filter(is_override=True, response__poll=poll, response__contact=contact).latest('response__date')
         except ResponseCategory.DoesNotExist:
-            try:    
-                r = ResponseCategory.objects.filter(category__name__in=['safe','unsafe'], response__poll=poll, response__message__connection__contact=contact).latest('response__message__date')           
+            pass
+        last_clear_response = None
+        try:
+            last_clear_response = ResponseCategory.objects.filter(category__name__in=['safe','unsafe'], response__poll=poll, response__contact=contact).latest('response__date')           
+        except ResponseCategory.DoesNotExist:
+            try:
+                last_clear_response = ResponseCategory.objects.filter(response__poll=poll, response__contact=contact).latest('response__date')
             except ResponseCategory.DoesNotExist:
-                try:
-                    r = ResponseCategory.objects.filter(response__poll=poll, response__message__connection__contact=contact).latest('response__message__date')
-                except ResponseCategory.DoesNotExist:
-                    r = None
+                pass
+        if last_clear_response and user_override_response:
+            if last_clear_response.response.date < user_override_response.response.date:
+                response = user_override_response
+            else:
+                response = last_clear_response
+        elif last_clear_response:
+            response = last_clear_response
+        else:
+            response = user_override_response
         if property == 'color':
-            if not r:
+            if not response:
                 return 'FF7'
             else:
-                return r.category.color
+                return response.category.color
         elif property == 'name':
-            if not r:
+            if not response:
                 return 'unknown'
             else:
-                return r.category.name
+                return response.category.name
         elif property == 'number':
-            if not r:
+            if not response:
                 return 2
             else: 
-                return r.category.priority
+                return response.category.priority
         else:
-            return r
+            return response
     except Poll.DoesNotExist:
         if property == 'number':
             return 4
