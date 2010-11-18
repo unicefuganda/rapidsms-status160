@@ -47,11 +47,15 @@
 </td>
 <td class="button_col">
     <div class="buttons">
-        <a href="javascript:void(0)" onclick="deleteContact('{{ contact.pk }}','{{ contact.name }}')">
-            <img src="{{ MEDIA_URL }}rapidsms/icons/silk/delete.png" />
-        </a>
-        <a href="javascript:void(0)" onclick="editContact('{{ contact.pk }}')">
-            <img src="{{ MEDIA_URL }}poll/icons/silk/pencil.png" />
-        </a>            
+        {% if perms.auth.delete_user %}
+            <a href="javascript:void(0)" onclick="deleteContact('{{ contact.pk }}','{{ contact.name }}')">
+                <img src="{{ MEDIA_URL }}rapidsms/icons/silk/delete.png" />
+            </a>
+        {% endif %}
+        {% if perms.auth.change_user %}
+            <a href="javascript:void(0)" onclick="editContact('{{ contact.pk }}')">
+                <img src="{{ MEDIA_URL }}poll/icons/silk/pencil.png" />
+            </a>
+        {% endif %}
     </div>
 </td>

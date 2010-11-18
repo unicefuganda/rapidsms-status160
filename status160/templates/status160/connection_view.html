@@ -1,7 +1,15 @@
 {% for connection in contact.connection_set.all %}
-    <a href="javascript:void(0)" onclick="$('#connections_{{ contact.pk }}_edit').load('../connections/{{ connection.pk }}/edit/')">{{ connection.identity }}</a>
+    {% if perms.rapidsms.change_connection %}
+        <a href="javascript:void(0)" onclick="$('#connections_{{ contact.pk }}_edit').load('../connections/{{ connection.pk }}/edit/')">
+    {% endif %}
+        {{ connection.identity }}
+    {% if perms.rapidsms.change_connection %}
+        </a>
+    {% endif %}
     <br clear="left"/>
 {% endfor %}
-<a class="small" href="javascript:void(0)" onclick="$('#connections_{{ contact.pk }}_edit').load('../connections/{{ contact.pk }}/add/')">add</a>
+{% if perms.rapidsms.add_connection %}
+    <a class="small" href="javascript:void(0)" onclick="$('#connections_{{ contact.pk }}_edit').load('../connections/{{ contact.pk }}/add/')">add</a>
+{% endif %}
 <div id="connections_{{ contact.pk }}_edit">
 </div>
