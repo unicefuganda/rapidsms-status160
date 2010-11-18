@@ -30,7 +30,7 @@ class EditContactForm(forms.Form): # pragma: no cover
     warden = forms.ModelChoiceField(queryset=Contact.objects.filter(pk__in=WardenRelationship.objects.all().values_list('warden', flat=True)).order_by('name'), required=False)
     teams = forms.ModelMultipleChoiceField(queryset=Team.objects.all().order_by('name'), required=False)
     agencies = forms.ModelMultipleChoiceField(queryset=Agency.objects.all().order_by('name'), required=False)
-    location = forms.ModelChoiceField(queryset=Area.objects.all(), required=False)
+    location = forms.ModelChoiceField(queryset=Area.objects.filter(kind__name='Office'), required=False)
     comments = forms.CharField(max_length=2000, required=False, widget=forms.Textarea(attrs={'rows': 2}))
     
     def __init__(self, data=None, **kwargs):
