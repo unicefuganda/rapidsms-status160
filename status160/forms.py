@@ -11,7 +11,7 @@ class FilterContactForm(forms.Form): # pragma: no cover
     wardens = forms.ModelMultipleChoiceField(queryset=Contact.objects.filter(pk__in=WardenRelationship.objects.all().values_list('warden', flat=True)).order_by('name'), required=False)
     teams = forms.ModelMultipleChoiceField(queryset=Team.objects.all().order_by('name'), required=False)
     agencies = forms.ModelMultipleChoiceField(queryset=Agency.objects.all().order_by('name'), required=False)
-    locations = forms.ModelMultipleChoiceField(queryset=Area.objects.all().order_by('name'), required=False)
+    locations = forms.ModelMultipleChoiceField(queryset=Area.objects.filter(kind__name='Office').order_by('name'), required=False)
     search_string = forms.CharField(max_length=1000, required=False)
     
 class MassTextForm(forms.Form):
