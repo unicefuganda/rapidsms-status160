@@ -17,6 +17,9 @@ from .forms import FilterContactForm, MassTextForm, CreateEventForm, ContactsFor
 from .utils import create_status_survey, send_mass_text, send_alert, filter_contacts
 
 def index(request):
+    return render_to_response("status160/index.html", {}, RequestContext(request)) 
+
+def dashboard(request):
     masstextform = MassTextForm()
     createventform = CreateEventForm()
     selected = False
@@ -38,7 +41,7 @@ def index(request):
         form = FilterContactForm()
         contacts = Contact.objects.all() 
     return render_to_response(
-                "status160/index.html", 
+                "status160/dashboard.html", 
                 {'form':form, 
                  'contacts':contacts,
                  'masstextform':masstextform,

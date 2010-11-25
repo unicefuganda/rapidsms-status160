@@ -7,7 +7,7 @@ admin.autodiscover()
 
 urlpatterns = patterns(
     '',
-    url(r'^dashboard/', login_required(index), name='status160-dashboard'),
+    url(r'^dashboard/', login_required(dashboard), name='status160-dashboard'),
     url(r'^event/new/', login_required(new_event)),
     url(r'^masstext/send/', login_required(send_masstext)),
     url(r'^alerts/send/', login_required(send_alerts)),
