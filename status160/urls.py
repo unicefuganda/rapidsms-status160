@@ -17,5 +17,6 @@ urlpatterns = patterns(
     url(r'^contacts/(\d+)/view/', login_required(view_contact)),
     url(r'^connections/(\d+)/add/', login_required(add_connection)),
     url(r'^connections/(\d+)/edit/', login_required(edit_connection)),
+    url(r'^connections/(\d+)/delete/', login_required(delete_connection)),
     url(r'^connections/(\d+)/view/', login_required(view_connections)),
 )

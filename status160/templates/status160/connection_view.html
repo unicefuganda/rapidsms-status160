@@ -1,10 +1,23 @@
 {% for connection in contact.connection_set.all %}
     {% if perms.rapidsms.change_connection %}
-        <a href="javascript:void(0)" onclick="$('#connections_{{ contact.pk }}_edit').load('../connections/{{ connection.pk }}/edit/')">
-    {% endif %}
+        <span id="connection_span_{{ connection.pk }}">
+            <a href="javascript:void(0)" onclick="$('#connections_{{ contact.pk }}_edit').load('../connections/{{ connection.pk }}/edit/')">{{ connection.identity }}</a>
+            <img style="display:none;cursor:pointer;" border="0"
+                onclick="if (confirm('Are you sure you want to delete {{ connection.identity }}?')) { $('#connections_{{ contact.pk }}').load('../connections/{{ connection.pk }}/delete/') }" src="{{ MEDIA_URL }}rapidsms/icons/silk/delete.png"
+                class="delete"/>
+        </span>
+        <script type="text/javascript">
+            $('#connection_span_{{ connection.pk }}').hover(
+                function() {
+                    $(this).find('img[class=delete]').show();
+                },
+                function() {
+                    $(this).find('img[class=delete]').hide();
+                }
+            );
+        </script>
+    {% else %}
         {{ connection.identity }}
-    {% if perms.rapidsms.change_connection %}
-        </a>
     {% endif %}
     <br clear="left"/>
 {% endfor %}

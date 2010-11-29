@@ -207,6 +207,11 @@ def edit_connection(request, connection_id):
         form = ConnectionForm(instance = connection)
     return render_to_response("status160/connection_edit.html", {'contact':connection.contact, 'form':form, 'connection':connection},context_instance=RequestContext(request))
 
+def delete_connection(request, connection_id):
+    connection = get_object_or_404(Connection, pk=connection_id)
+    connection.delete()
+    return render_to_response("status160/connection_view.html", {'contact':connection.contact },context_instance=RequestContext(request))
+
 def add_connection(request, contact_id):
     contact = get_object_or_404(Contact, pk=contact_id)
     if request.method == 'POST':
