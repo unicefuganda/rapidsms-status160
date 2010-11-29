@@ -133,6 +133,11 @@ def edit_contact(request, contact_id):
         if contact_form.is_valid():
             contact.name = contact_form.cleaned_data['name']
             if contact_form.cleaned_data['warden']:
+                old_wardenrel = WardenRelationship.objects.filter(dependents=contact)
+                if old_wardenrel.count():
+                    for w in old_wardenrel:
+                        w.dependents.remove(contact)
+
                 wardenrel = WardenRelationship.objects.get(warden=contact_form.cleaned_data['warden'])
                 wardenrel.dependents.add(contact)
             contact.groups.clear()
