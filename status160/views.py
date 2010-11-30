@@ -164,21 +164,14 @@ def edit_contact(request, contact_id):
             return render_to_response("status160/contact_row_edit.html", {'contact':contact, 'form':contact_form},context_instance=RequestContext(request))    
 
     else:
-        teams = []
-        agencies = []
+        teams = Team.objects.filter(id__in=contact.groups.all())
+        agencies = Agency.objects.filter(id__in=contact.groups.all())
         poll = None
         try:
             poll = Poll.objects.filter(contacts=contact).exclude(start_date=None).filter(Q(end_date=None) | (~Q(end_date=None) & Q(end_date__gt=datetime.datetime.now()))).latest('start_date')
         except Poll.DoesNotExist:
             pass
-        for g in contact.groups.all():
-            try:
-                agencies.append(g.agency)
-            except Agency.DoesNotExist:
-                try:
-                    teams.append(g.team)
-                except Team.DoesNotExist:
-                    pass
+
         if contact.charges.count():
             warden = contact.charges.all()[0].warden
         else:
