@@ -159,7 +159,7 @@ def edit_contact(request, contact_id):
                 response.categories.add(ResponseCategory.objects.create(response=response, is_override=True, user=request.user, category=status))
             contact.save()
 
-            return render_to_response("status160/contact_row_view.html", {'contact':contact})
+            return render_to_response("status160/contact_row_view.html", {'contact':contact},RequestContext(request))
         else:
             return render_to_response("status160/contact_row_edit.html", {'contact':contact, 'form':contact_form},context_instance=RequestContext(request))    
 
@@ -183,7 +183,7 @@ def edit_contact(request, contact_id):
             'agencies': agencies,
             'location': contact.reporting_location,
         }, poll=poll, contact=contact)
-        return render_to_response("status160/contact_row_edit.html", {'contact':contact, 'form':contact_form},context_instance=RequestContext(request))
+        return render_to_response("status160/contact_row_edit.html", {'contact':contact, 'form':contact_form},RequestContext(request))
 
 def view_contact(request, contact_id):
     contact = get_object_or_404(Contact, pk=contact_id)
