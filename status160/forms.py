@@ -56,7 +56,5 @@ class EditContactForm(forms.Form): # pragma: no cover
                 initial_category = initial_category.category
             self.fields['status'] = forms.ModelChoiceField(required=True, queryset=poll.categories.all(), initial=initial_category) 
 
-class ConnectionForm(forms.ModelForm): # pragma: no cover
-    class Meta:
-        model = Connection
-        fields = ('identity','backend',)    
+class ConnectionForm(forms.Form): # pragma: no cover
+    identity = forms.IntegerField()

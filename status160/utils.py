@@ -6,6 +6,7 @@ from poll.models import Poll, Category
 from django.contrib.sites.models import Site
 from rapidsms_httprouter.router import get_router
 from rapidsms.messages.outgoing import OutgoingMessage
+from rapidsms.models import Backend
 from status160.templatetags.status import status
 
 def create_status_survey(description, question, contacts, user):
@@ -119,3 +120,16 @@ def filter_contacts(wardens, teams, agencies, locations, search_string):
                 ))).distinct()
 
     return contacts
+
+PREFIXES = [('70', 'warid'), ('75', 'zain'), ('71', 'utl'), ('', 'dmark')]
+
+def assign_backend(number):
+    if number.startswith('0'):
+        number = '256' + number[1:]
+    backendobj = None
+    for prefix, backend in PREFIXES:
+        if number[3:].startswith(prefix):
+            backendobj, created = Backend.objects.get_or_create(name=backend)
+            break
+    return (number, backendobj)
+
