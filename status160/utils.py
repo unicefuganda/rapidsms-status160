@@ -125,7 +125,7 @@ PREFIXES = [('70', 'warid'), ('75', 'zain'), ('71', 'utl'), ('', 'dmark')]
 
 def assign_backend(number):
     if number.startswith('0'):
-        number = '256' + number[1:]
+        number = '256%s' % number[1:]
     backendobj = None
     for prefix, backend in PREFIXES:
         if number[3:].startswith(prefix):
