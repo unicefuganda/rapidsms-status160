@@ -15,6 +15,7 @@ from rapidsms_httprouter.models import Message
 import datetime
 from .forms import FilterContactForm, MassTextForm, CreateEventForm, ContactsForm, EditContactForm, ConnectionForm
 from .utils import create_status_survey, send_mass_text, send_alert, filter_contacts, assign_backend
+from status160 import templatetags
 
 def index(request):
     return render_to_response("status160/index.html", {}, RequestContext(request)) 
@@ -182,6 +183,7 @@ def edit_contact(request, contact_id):
             'teams': teams,
             'agencies': agencies,
             'location': contact.reporting_location,
+            'status': templatetags.status.status(contact),
         }, poll=poll, contact=contact)
         return render_to_response("status160/contact_row_edit.html", {'contact':contact, 'form':contact_form},RequestContext(request))
 

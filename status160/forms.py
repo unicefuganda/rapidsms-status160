@@ -4,7 +4,6 @@ from rapidsms.models import Contact, Connection, ConnectionBase
 from .models import WardenRelationship, Team, Agency
 from simple_locations.models import Area
 from poll.models import Poll, ResponseCategory, Response
-from status160.templatetags.status import status
 
 class FilterContactForm(forms.Form): # pragma: no cover
     
@@ -51,10 +50,7 @@ class EditContactForm(forms.Form): # pragma: no cover
         else:
             forms.Form.__init__(self, **kwargs)
         if poll:
-            initial_category = status(contact, "status")
-            if initial_category:
-                initial_category = initial_category.category
-            self.fields['status'] = forms.ModelChoiceField(required=True, queryset=poll.categories.all(), initial=initial_category) 
+            self.fields['status'] = forms.ModelChoiceField(required=True, queryset=poll.categories.all()) 
 
 class ConnectionForm(forms.Form): # pragma: no cover
     identity = forms.CharField(max_length=15)
