@@ -7,7 +7,7 @@ def status(contact, property=None):
     nosurvey_attr_dict = {
         'color':'',
         'name':'',
-        'number':4,
+        'priority':4,
     }
     try:
         poll = Poll.objects.filter(contacts=contact).exclude(start_date=None).filter(Q(end_date=None) | (~Q(end_date=None) & Q(end_date__gt=datetime.datetime.now()))).latest('start_date')

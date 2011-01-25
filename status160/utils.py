@@ -60,7 +60,7 @@ def send_alert():
     for warden in WardenRelationship.objects.all():
         outstanding = []
         for dependent in warden.dependents.all():
-            status_num = status(dependent, 'number')
+            status_num = status(dependent, 'priority')
             if int(status_num) < 3:
                 outstanding.append((dependent, status_num))
                 
