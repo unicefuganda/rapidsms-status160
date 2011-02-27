@@ -5,7 +5,7 @@ setup(
     version='0.1',
     license="BSD",
 
-    requires = ["rapidsms",
+    install_requires = ["rapidsms",
                 'django-eav',
                 'rapidsms-auth',
                 'rapidsms-polls',
