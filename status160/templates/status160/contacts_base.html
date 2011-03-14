@@ -1,0 +1,41 @@
+{% extends "generic/base.html" %}
+{% block title %}
+    Staff - {{ block.super }}
+{% endblock %}
+{% block stylesheets %}
+    {{ block.super }}
+<link type="text/css" rel="stylesheet" href="{{ MEDIA_URL }}status160/stylesheets/status160.css" />
+{% endblock %}
+{% block javascripts %}
+    {{ block.super }}
+    <script src="{{MEDIA_URL}}status160/javascripts/status160.js" type="text/javascript"></script>
+{% endblock %}
+{% block action_forms %}
+    <table>
+        <tr>
+            <td style="border:none">
+                <div class="buttons">
+                    {% if perms.status160.add_alert %}
+                        <a href="javascript:void(0)" onclick="action(this,'status160.forms.SendAlertsForm');$('#div_action_0').hide();$('#div_action_1').hide()">
+                            Send Alerts to Wardens
+                            <img src="{{ MEDIA_URL }}rapidsms/icons/silk/phone.png" />
+                        </a>
+                    {% endif %}
+                    {% if perms.poll.add_poll %}
+                        <a href="javascript:void(0)" onclick="$('#div_action_1').show();$('#div_action_0').hide()">
+                            Create Status Survey
+                            <img src="{{ MEDIA_URL }}rapidsms/icons/silk/help.png" />
+                        </a>
+                    {% endif %}
+                    {% if perms.rapidsms_httprouter.add_message %}
+                        <a href="javascript:void(0)" onclick="$('#div_action_0').show();$('#div_action_1').hide()">
+                            Send Mass Text Message
+                            <img src="{{ MEDIA_URL }}rapidsms/icons/silk/email_go.png" />
+                        </a>
+                    {% endif %}
+                </div>
+            </td>
+        </tr>
+    </table>
+    {{ block.super }}        
+{% endblock %}

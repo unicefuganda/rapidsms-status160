@@ -13,42 +13,12 @@ from simple_locations.models import Area
 from poll.models import Poll, ResponseCategory, Response
 from rapidsms_httprouter.models import Message
 import datetime
-from .forms import FilterContactForm, MassTextForm, CreateEventForm, ContactsForm, EditContactForm, ConnectionForm
-from .utils import create_status_survey, send_mass_text, send_alert, filter_contacts, assign_backend
+from .utils import assign_backend
+from .forms import ConnectionForm, EditContactForm, NewContactForm
 from status160 import templatetags
 
 def index(request):
     return render_to_response("status160/index.html", {}, RequestContext(request)) 
-
-def dashboard(request):
-    masstextform = MassTextForm()
-    createventform = CreateEventForm()
-    selected = False
-    if request.method == 'POST':
-        form = FilterContactForm(request.POST)
-        if form.is_valid():
-            wardens = form.cleaned_data['wardens']
-            teams = form.cleaned_data['teams']
-            agencies = form.cleaned_data['agencies']
-            locations = form.cleaned_data['locations']
-            search_string = form.cleaned_data['search_string']
-
-            contacts = filter_contacts(wardens, teams, agencies, locations, search_string)
-            selected = True
-        else:
-            # no required fields, invalid field means something funky happened
-            return HttpResponse(status=404)
-    else:
-        form = FilterContactForm()
-        contacts = Contact.objects.all() 
-    return render_to_response(
-                "status160/dashboard.html", 
-                {'form':form, 
-                 'contacts':contacts,
-                 'masstextform':masstextform,
-                 'createeventform':createventform,
-                 'selected': selected,
-                 }, RequestContext(request)) 
 
 def whitelist(request):
     return render_to_response(
@@ -58,70 +28,46 @@ def whitelist(request):
     context_instance=RequestContext(request))
 
 @require_POST
-def new_event(request):
-    response = None
-    if request.method == 'POST':
-        form = CreateEventForm(request.POST)
-        contacts_form = ContactsForm(request.POST)
-        if form.is_valid() and contacts_form.is_valid():
-            contacts = contacts_form.cleaned_data['contacts']
-            poll = create_status_survey(
-                form.cleaned_data['short_description'],
-                form.cleaned_data['text_question'], 
-                contacts, 
-                request.user)
-            response = "Event created, messages sent!"
-            form = CreateEventForm()
-        elif not contacts_form.is_valid():
-            form.errors.setdefault('short_description', ErrorList())
-            form.errors['short_description'].append('A status survey must have contacts.')
-        
-    else:
-        form = CreateEventForm()
-    return render_to_response("status160/event.html", {'createeventform':form, 'response':response},context_instance=RequestContext(request))    
-
-@require_POST
-def send_masstext(request):
-    response = None
-    if request.method == 'POST':
-        form = MassTextForm(request.POST)
-        contacts_form = ContactsForm(request.POST)
-        if form.is_valid() and contacts_form.is_valid():
-            send_mass_text(contacts_form.cleaned_data['contacts'], form.cleaned_data['text'])
-            response = "Messages Sent!"
-            form = MassTextForm()
-        elif not contacts_form.is_valid():
-            form.errors.setdefault('text', ErrorList())
-            form.errors['text'].append('A set of recipients is required.')            
-    else:
-        form = MassTextForm()
-    return render_to_response("status160/masstext.html", {'masstextform':form, 'response':response},context_instance=RequestContext(request))
-
-@require_POST
-def send_alerts(request):
-#    if not request.user.has_perm('status160.add_alert'):
-#        return Response(status=412)
-    try:
-        alert = Alert.objects.latest('sent')
-        td = datetime.datetime.now() - alert.sent
-        total_seconds = (td.microseconds + (td.seconds + td.days * 24 * 3600) * 10**6) / 10**6
-        
-        # don't spam like crazy
-        if (total_seconds < 900):
-            return HttpResponse(content='<span style="color:red">An alert was sent in the past 15 minutes, please try later.</span>', status=200)   
-    except Alert.DoesNotExist:
-        # first alert can be sent whenever
-        pass
-
-    send_alert()
-
-    return HttpResponse(content='<span style="color:green">Alerts Sent!</span>', status=200)
-
-@require_POST
 def delete_contact(request, contact_id):
     contact = get_object_or_404(Contact, pk=contact_id)
     contact.delete()
     return HttpResponse(status=200)
+
+def add_contact(request):
+    form = NewContactForm()
+    if request.method == 'POST':
+        form = NewContactForm(request.POST)
+        if form.is_valid():
+            contact = Contact.objects.create(name=form.cleaned_data['name'])
+            identity = form.cleaned_data['identity']
+            identity, backend = assign_backend(str(identity))
+            connection, created = Connection.objects.get_or_create(identity=identity, backend=backend)
+            connection.contact = contact
+            connection.save()
+
+            warden = form.cleaned_data['warden']
+            teams = form.cleaned_data['teams']
+            agencies = form.cleaned_data['agencies']
+            location = form.cleaned_data['location']
+            is_warden = form.cleaned_data['is_warden']
+
+            contact.reporting_location = location
+            for t in teams:
+                contact.groups.add(t)
+
+            for a in agencies:
+                contact.groups.add(a)
+
+            if warden:
+                wrel = WardenRelationship.objects.get(warden=warden)
+                wrel.dependents.add(contact)
+
+            if is_warden:
+                WardenRelationship.objects.create(warden=contact)
+
+            return render_to_response('status160/partials/contact_row.html', {'object':contact}, RequestContext(request))
+
+    return render_to_response("status160/partials/new_contact.html",{'form':form},RequestContext(request))
 
 def edit_contact(request, contact_id):
     contact = get_object_or_404(Contact, pk=contact_id)
@@ -160,9 +106,9 @@ def edit_contact(request, contact_id):
                 response.categories.add(ResponseCategory.objects.create(response=response, is_override=True, user=request.user, category=status))
             contact.save()
 
-            return render_to_response("status160/contact_row_view.html", {'contact':contact},RequestContext(request))
+            return render_to_response("status160/partials/contact_row.html", {'object':contact},RequestContext(request))
         else:
-            return render_to_response("status160/contact_row_edit.html", {'contact':contact, 'form':contact_form},context_instance=RequestContext(request))    
+            return render_to_response("status160/partials/contact_row_edit.html", {'contact':contact, 'form':contact_form},context_instance=RequestContext(request))    
 
     else:
         teams = Team.objects.filter(id__in=contact.groups.all())
@@ -185,11 +131,7 @@ def edit_contact(request, contact_id):
             'location': contact.reporting_location,
             'status': templatetags.status.status(contact),
         }, poll=poll, contact=contact)
-        return render_to_response("status160/contact_row_edit.html", {'contact':contact, 'form':contact_form},RequestContext(request))
-
-def view_contact(request, contact_id):
-    contact = get_object_or_404(Contact, pk=contact_id)
-    return render_to_response("status160/contact_row_view.html", {'contact':contact },RequestContext(request))
+        return render_to_response("status160/partials/contact_row_edit.html", {'contact':contact, 'form':contact_form},RequestContext(request))
 
 def edit_connection(request, connection_id):
     connection = get_object_or_404(Connection, pk=connection_id)
@@ -201,15 +143,15 @@ def edit_connection(request, connection_id):
             connection.identity = identity
             connection.backend = backend
             connection.save()
-            return render_to_response("status160/connection_view.html", {'contact':connection.contact },context_instance=RequestContext(request))
+            return render_to_response("status160/partials/connection_view.html", {'object':connection.contact },context_instance=RequestContext(request))
     else:
         form = ConnectionForm({'identity':connection.identity})
-    return render_to_response("status160/connection_edit.html", {'contact':connection.contact, 'form':form, 'connection':connection},context_instance=RequestContext(request))
+    return render_to_response("status160/partials/connection_edit.html", {'contact':connection.contact, 'form':form, 'connection':connection},context_instance=RequestContext(request))
 
 def delete_connection(request, connection_id):
     connection = get_object_or_404(Connection, pk=connection_id)
     connection.delete()
-    return render_to_response("status160/connection_view.html", {'contact':connection.contact },context_instance=RequestContext(request))
+    return render_to_response("status160/partials/connection_view.html", {'object':connection.contact },context_instance=RequestContext(request))
 
 def add_connection(request, contact_id):
     contact = get_object_or_404(Contact, pk=contact_id)
@@ -219,12 +161,11 @@ def add_connection(request, contact_id):
             identity = form.cleaned_data['identity']
             identity, backend = assign_backend(str(identity))
             connection = Connection.objects.create(identity=identity, backend=backend, contact=contact)
-            return render_to_response("status160/connection_view.html", {'contact':contact },context_instance=RequestContext(request))
+            return render_to_response("status160/partials/connection_view.html", {'object':contact },context_instance=RequestContext(request))
     else:
         form = ConnectionForm()
-    return render_to_response("status160/connection_edit.html", {'contact':contact, 'form':form },context_instance=RequestContext(request))
+    return render_to_response("status160/partials/connection_edit.html", {'contact':contact, 'form':form },context_instance=RequestContext(request))
 
 def view_connections(request, contact_id):
     contact = get_object_or_404(Contact, pk=contact_id)
-    return render_to_response("status160/connection_view.html", {'contact':contact},context_instance=RequestContext(request))
-
+    return render_to_response("status160/partials/connection_view.html", {'object':contact},context_instance=RequestContext(request))

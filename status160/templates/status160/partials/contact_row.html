@@ -1,0 +1,61 @@
+{% extends 'generic/partials/partial_row.html' %}
+{% load status %}
+{% load warden %}
+{% load comments %}
+{% load lastmessage %}
+{% load lastpoll %}
+{% block remaining_row_content %}
+    <td class="name_col">
+        {{ object.name }}
+        <br clear="left"/>
+        <div id="connections_{{ object.pk }}">
+            {% include "status160/partials/connection_view.html" %}
+        </div>
+    </td>
+    <td class="team_col">
+        {% for group in object.groups.all %}
+            {% if group.team %}
+              {{ group.name }}
+            {% endif %}
+        {% endfor %}
+    </td>
+    <td class="agency_col">
+        {% for group in object.groups.all %}
+            {% if group.agency %}
+              {{ group.name }}
+            {% endif %}
+        {% endfor %}    
+    </td>
+    <td class="location_col">
+        {{ object.reporting_location.name }}
+    </td>
+    <td class="event_col">
+        {{ object|lastpoll:"name" }}
+    </td>
+    <td style="background-color:#{{ object|status:"color" }}" class="status_col">
+        {{ object|status:"name" }}
+    </td>
+    <td class="warden_col">
+        {{ object|warden }}
+    </td>
+    <td class="comments_col">
+        {% for comment in object|comments %}
+            {{ comment.text }}
+        {% endfor %}
+    </td>
+    <td class="message_col">
+        {{ object|lastmessage }}
+    </td>
+    <td class="button_col">
+        {% if perms.auth.delete_user %}
+            <a href="javascript:void(0)" onclick="deleteContact(this, '{{ object.pk }}','{{ object.name }}')">
+                <img src="{{ MEDIA_URL }}rapidsms/icons/silk/delete.png" />
+            </a>
+        {% endif %}
+        {% if perms.auth.change_user %}
+            <a href="javascript:void(0)" onclick="editContact(this, '{{ object.pk }}')">
+                <img src="{{ MEDIA_URL }}poll/icons/silk/pencil.png" />
+            </a>
+        {% endif %}
+    </td>
+{% endblock %}

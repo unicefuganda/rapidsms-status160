@@ -1,0 +1,30 @@
+<td>&nbsp;</td>
+<td colspan="10">
+    <a id="anchor_add_contact" style="display:none" href="javascript:void(0)" onclick="newContact(this)">Add new</a>
+    <div id="div_add_contact">
+        <table>
+            <tr>
+                <td>Name: {{ form.name.errors }}</td>
+                <td>{{ form.name }}</td>
+                <td>Warden?</td>
+                <td>{{ form.is_warden }}</td>
+                <td>Duty station:</td>
+                <td>{{ form.location }}</td>
+            </tr>
+            <tr>
+                <td>Primary contact #: {{ form.identity.errors }}</td>
+                <td>{{ form.identity }}</td>
+                <td>Teams:</td>
+                <td>{{ form.teams }}</td>
+                <td>Agency:</td>
+                <td>{{ form.agencies }}</td>
+            </tr>
+            <tr>
+                <td>Warden:</td>
+                <td>{{ form.warden }}</td>
+                <td><a href="javascript:void(0)" onclick="submitForm(this, '../contacts/add/', $(this).parents('tr'))">Add</a></td>
+                <td><a href="javascript:void(0)" onclick="$('#div_add_contact').hide();$('#anchor_add_contact').show()">Cancel</a></td>        
+                <td colspan="2">&nbsp;</td>
+        </table>
+    </div>
+</td>

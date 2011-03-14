@@ -37,6 +37,20 @@
     display: inline;
 }
 
+.action_form_help {
+    font-size:8pt;
+    color:gray;
+    float:left;
+}
+
+.filter_form_help {
+    font-size:8pt;
+    color:gray;
+    top:1.5em;
+    position:relative;
+    float:left;
+}
+
 #messageform, #eventform {
 
 }
@@ -103,17 +117,159 @@
 
 }
 
-/* BUTTONS */
-
-.button_col {
-    width: 90px;
-    padding: 0px;
+.results ul {
+    list-style-type:none;
+    margin:2px;
+    padding:0;
 }
+
+.results li {
+    padding:1px;
+    font-size:6pt;
+}
+
+#filters {
+    height: 12em;
+}
+
+#div_filter_0 {
+    position:absolute;
+    top: 3em;
+    left: 0;
+}
+
+#div_filter_0 label {
+    position:absolute;
+    top: 0;
+    left:0;
+    font-weight:bold;
+    white-space: nowrap;
+}
+
+#div_filter_0 select {
+    position:absolute;
+    top:1em;
+    left:0;
+    width:9em;
+    height:7.5em;
+}
+
+#div_filter_1 {
+    position:absolute;
+    left:20%;
+    top:3em;
+}
+
+#div_filter_1 label {
+    position:absolute;
+    top: 0;
+    left:0;
+    font-weight:bold;
+    white-space: nowrap;
+}
+
+#div_filter_1 select {
+    position:absolute;
+    top:1em;
+    left:0;
+    width:9em;
+    height:7.5em;
+}
+
+#div_filter_2 {
+    position:absolute;
+    left: 40%;
+    top: 3em;
+}
+
+#div_filter_2 label {
+    position:absolute;
+    top: 0;
+    left:0;
+    font-weight:bold;
+    white-space: nowrap;
+}
+
+#div_filter_2 select {
+    position:absolute;
+    top:1em;
+    left:0;
+    width:9em;
+    height:7.5em;
+}
+
+#div_filter_3 {
+    position:absolute;
+    left: 60%;
+    top: 3em;
+}
+
+#div_filter_3 label {
+    position:absolute;
+    top: 0;
+    left:0;
+    font-weight:bold;
+    white-space: nowrap;
+}
+
+#div_filter_3 select {
+    position:absolute;
+    top:1em;
+    left:0;
+    width:9em;
+    height:7.5em;
+}
+
+#div_filter_4 {
+    position:absolute;
+    left: 80%;
+    top: 3em;
+}
+
+#div_filter_4 label {
+    font-weight:bold;
+    position:absolute;
+    top:0;
+    left:0;
+}
+
+#div_filter_4 input {
+    position:absolute;
+    top: 3em;
+    left: 0;
+    width: 9em;
+}
+
+#div_filter_update {
+    position:absolute;
+    right:2em;
+    bottom:0;
+}
+
+#div_filter_clear {
+    position:absolute;
+    left: 80%;
+    bottom: 0;
+}
+
+#div_action_0 {
+    display:none;
+}
+
+#div_action_1 {
+    display:none;
+}
+
+#div_action_2 {
+    display:none;
+}
+
+/* BUTTONS */
 
 .buttons a, .buttons button{
     display:block;
     float:right;
-    margin:0 3px 0 0;
+    margin:0 7px 0 0;
     background-color:#f5f5f5;
     border:1px solid #dedede;
     border-top:1px solid #eee;
@@ -126,7 +282,7 @@
     font-weight:bold;
     color:#565656;
     cursor:pointer;
-    padding:5px 5px 5px 5px; /* Links */
+    padding:5px 10px 6px 7px; /* Links */
 }
 .buttons button{
     width:auto;
