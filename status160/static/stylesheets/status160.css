@@ -8,10 +8,6 @@
     width:75px;
 }
 
-#id_location, #id_warden, #id_name, #id_identity, #id_backend, #id_agencies, #id_teams {
-    width:75px;
-}
-
 #id_status {
     width:55px;
 }
@@ -126,6 +122,25 @@
 .results li {
     padding:1px;
     font-size:6pt;
+}
+
+.add-contact {
+    background-color:#ccf;
+    border:0px;
+    border-collapse:collapse;
+    font-weight:bold;
+    padding: 5px;
+}
+
+.add-contact td {
+    border: 0px;
+    vertical-align: top;
+    text-align: left;
+    padding: 5px;
+}
+
+#id_name, #id_identity {
+    width: 9em;
 }
 
 #filters {
