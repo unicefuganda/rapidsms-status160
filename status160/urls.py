@@ -7,6 +7,7 @@ from contact.forms import FreeSearchForm, DistictFilterForm, MassTextForm
 from generic.sorters import SimpleSorter
 from .views import *
 from .forms import CreateEventForm, SendAlertsForm, AgencyFilterForm, TeamFilterForm, OfficeFilterForm, WardenFilterForm
+from .sorters import StatusSorter
 admin.autodiscover()
 
 urlpatterns = patterns(
@@ -24,7 +25,7 @@ urlpatterns = patterns(
                  ('Agency', False, '', None,),
                  ('Location',True,'reporting_location__name', SimpleSorter(),),
                  ('Event',False,'', None,),
-                 ('Status',False,'', None,),
+                 ('Status',True,'status', StatusSorter(),),
                  ('Warden',False,'', None,),
                  ('Comments',False,'', None,),
                  ('Last Message',False,'', None,),
