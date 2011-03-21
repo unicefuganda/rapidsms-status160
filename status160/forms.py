@@ -38,7 +38,7 @@ class TeamFilterForm(FilterForm):
     teams = forms.ModelMultipleChoiceField(queryset=Team.objects.all().order_by('name'), label="Show teams:")
 
     def filter(self, request, queryset):
-        groups_pk = self.cleaned_data['show_teams']
+        groups_pk = self.cleaned_data['teams']
         return queryset.filter(groups__in=groups_pk)
 
 class OfficeFilterForm(FilterForm):
