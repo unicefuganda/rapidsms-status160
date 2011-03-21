@@ -189,7 +189,7 @@ class NewContactForm(forms.Form):
     agencies = forms.ModelMultipleChoiceField(queryset=Agency.objects.all().order_by('name'), required=False)
     location = forms.ModelChoiceField(queryset=Area.objects.filter(kind__name='Office'), required=False)
     identity = forms.CharField(max_length=15, required=True, label="Primary contact information")
-    is_warden = forms.BooleanField()
+    is_warden = forms.BooleanField(required=False, initial=False)
 
 class ConnectionForm(forms.Form): # pragma: no cover
     identity = forms.CharField(max_length=15)

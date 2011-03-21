@@ -65,7 +65,7 @@ def add_contact(request):
             if is_warden:
                 WardenRelationship.objects.create(warden=contact)
 
-            return render_to_response('status160/partials/contact_row.html', {'object':contact}, RequestContext(request))
+            return render_to_response('status160/partials/contact_row.html', {'object':contact, 'selectable':True}, RequestContext(request))
 
     return render_to_response("status160/partials/new_contact.html",{'form':form},RequestContext(request))
 
@@ -106,7 +106,7 @@ def edit_contact(request, contact_id):
                 response.categories.add(ResponseCategory.objects.create(response=response, is_override=True, user=request.user, category=status))
             contact.save()
 
-            return render_to_response("status160/partials/contact_row.html", {'object':contact},RequestContext(request))
+            return render_to_response("status160/partials/contact_row.html", {'object':contact, 'selectable':True},RequestContext(request))
         else:
             return render_to_response("status160/partials/contact_row_edit.html", {'contact':contact, 'form':contact_form},context_instance=RequestContext(request))    
 
@@ -160,7 +160,9 @@ def add_connection(request, contact_id):
         if form.is_valid():
             identity = form.cleaned_data['identity']
             identity, backend = assign_backend(str(identity))
-            connection = Connection.objects.create(identity=identity, backend=backend, contact=contact)
+            connection, created = Connection.objects.get_or_create(identity=identity, backend=backend)
+            connection.contact = contact
+            connection.save()
             return render_to_response("status160/partials/connection_view.html", {'object':contact },context_instance=RequestContext(request))
     else:
         form = ConnectionForm()

@@ -13,7 +13,10 @@ function editContact(elem, pk) {
 }
 
 function newContact(elem) {
-    $(elem).parents('tr').load('../contacts/add/');
+    rowelem = $(elem).parents('tr')
+    rowelem.after('<tr></tr>')
+    rowelem.next().load('../contacts/add');
+    $('#add_contact_anchor_row').hide();
 }
 
 function submitForm(elem, action, resultDiv) {

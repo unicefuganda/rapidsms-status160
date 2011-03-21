@@ -1,6 +1,6 @@
 <td>&nbsp;</td>
 <td colspan="10">
-    <a id="anchor_add_contact" style="display:none" href="javascript:void(0)" onclick="newContact(this)">Add new</a>
+    <!-- <a id="anchor_add_contact" style="display:none" href="javascript:void(0)" onclick="newContact(this)">Add new</a> -->
     <div id="div_add_contact">
         <table class="add-contact">
             <tr>
@@ -27,8 +27,8 @@
             </tr>
             <tr>
                 <td colspan="6">
-                    <a href="javascript:void(0)" onclick="submitForm(this, '../contacts/add/', $(this).parents('tr'))">Add</a> | 
-                    <a href="javascript:void(0)" onclick="$('#div_add_contact').hide();$('#anchor_add_contact').show()">Cancel</a>
+                    <a href="javascript:void(0)" onclick="submitForm(this, '../contacts/add/', $(this).parents('tr'));$('#add_contact_anchor_row').show();">Add</a> | 
+                    <a href="javascript:void(0)" onclick="$(this).parents('tr').remove();$('#add_contact_anchor_row').show();">Cancel</a>
                 </td>
             </tr>
         </table>
