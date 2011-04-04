@@ -27,7 +27,7 @@
             </tr>
             <tr>
                 <td colspan="6">
-                    <a href="javascript:void(0)" onclick="submitForm(this, '../contacts/add/', $(this).parents('tr'));$('#add_contact_anchor_row').show();">Add</a> | 
+                    <a href="javascript:void(0)" onclick="submitForm(this, '{% url status160.views.add_contact %}', $(this).parents('tr'));$('#add_contact_anchor_row').show();">Add</a> | 
                     <a href="javascript:void(0)" onclick="$(this).parents('tr').remove();$('#add_contact_anchor_row').show();">Cancel</a>
                 </td>
             </tr>

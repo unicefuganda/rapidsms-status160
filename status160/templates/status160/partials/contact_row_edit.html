@@ -59,10 +59,10 @@
 </td>
 <td class="button_col">
     <div class="buttons">
-        <a href="javascript:void(0)" onclick="$(this).parents('tr').load('../contacts/{{ contact.pk }}/view/')">
+        <a href="javascript:void(0)" onclick="$(this).parents('tr').load('{% url status160-contact contact.pk %}')">
             <img src="{{ MEDIA_URL }}rapidsms/icons/silk/decline.png" />
         </a>
-        <a href="javascript:void(0)" onclick="submitForm(this, '../contacts/{{ contact.pk }}/edit/', $(this).parents('tr'))">
+        <a href="javascript:void(0)" onclick="submitForm(this, '{% url status160.views.edit_contact contact.pk %}', $(this).parents('tr'))">
             <img src="{{ MEDIA_URL }}rapidsms/icons/silk/accept.png" />
         </a>        
     </div>

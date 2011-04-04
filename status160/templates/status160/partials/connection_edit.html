@@ -4,11 +4,11 @@
         <img src="{{ MEDIA_URL }}rapidsms/icons/silk/decline.png" />
     </a>
     {% if connection.pk %}
-        <a href="javascript:void(0)" onclick="submitForm(this, '../connections/{{ connection.pk }}/edit/', $('#connections_{{ contact.pk }}'))">
+        <a href="javascript:void(0)" onclick="submitForm(this, '{% url status160.views.edit_connection connection.pk %}', $('#connections_{{ contact.pk }}'))">
             <img src="{{ MEDIA_URL }}rapidsms/icons/silk/accept.png" />
         </a>
     {% else %}
-        <a href="javascript:void(0)" onclick="submitForm(this, '../connections/{{ contact.pk }}/add/', $('#connections_{{ contact.pk }}'))">
+        <a href="javascript:void(0)" onclick="submitForm(this, '{% url status160.views.add_connection contact.pk %}', $('#connections_{{ contact.pk }}'))">
             <img src="{{ MEDIA_URL }}rapidsms/icons/silk/accept.png" />
         </a>
     {% endif %}            

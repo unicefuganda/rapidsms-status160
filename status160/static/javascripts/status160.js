@@ -1,21 +1,21 @@
-function deleteContact(elem,pk,name) {
+function deleteContact(elem,link,name) {
     if (confirm('Are you sure you want to remove ' + name + '?')) {
         $(elem).parents('tr').remove();
-        $.post('../contacts/' + pk + '/delete/', function(data) {});
+        $.post(link, function(data) {});
     }
 }
 
-function editContact(elem, pk) {
+function editContact(elem, link) {
     overlay_loading_panel($(elem).parents('tr'));
-    $(elem).parents('tr').load('../contacts/' + pk + '/edit/', '', function () {
+    $(elem).parents('tr').load(link, '', function () {
         $('#div_panel_loading').hide();    
     });
 }
 
-function newContact(elem) {
+function newContact(elem, link) {
     rowelem = $(elem).parents('tr')
     rowelem.after('<tr></tr>')
-    rowelem.next().load('../contacts/add');
+    rowelem.next().load(link);
     $('#add_contact_anchor_row').hide();
 }
 

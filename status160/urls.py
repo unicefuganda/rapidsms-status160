@@ -1,5 +1,4 @@
 from django.conf.urls.defaults import *
-from django.contrib.auth.decorators import login_required
 from django.contrib import admin
 
 from generic.views import generic, generic_row
@@ -12,7 +11,7 @@ admin.autodiscover()
 
 urlpatterns = patterns(
     '',
-    url(r'^dashboard/$', login_required(generic), {
+    url(r'^dashboard/$', generic, {
       'model':Contact,
       'filter_forms':[WardenFilterForm, TeamFilterForm, AgencyFilterForm, OfficeFilterForm, FreeSearchForm],
       'action_forms':[MassTextForm, CreateEventForm, SendAlertsForm],
@@ -31,13 +30,13 @@ urlpatterns = patterns(
                  ('Last Message',False,'', None,),
                  ('',False,'',None,)],
     }, name='status160-dashboard'),
-    url(r'^contacts/(?P<pk>\d+)/view/', generic_row, {'model':Contact, 'partial_row':'status160/partials/contact_row.html'}),
+    url(r'^contacts/(?P<pk>\d+)/view/', generic_row, {'model':Contact, 'partial_row':'status160/partials/contact_row.html'}, name="status160-contact"),
     url(r'^whitelist/', whitelist),
-    url(r'^contacts/(\d+)/delete/', login_required(delete_contact)),
-    url(r'^contacts/(\d+)/edit/', login_required(edit_contact)),
-    url(r'^contacts/add/', login_required(add_contact)),
-    url(r'^connections/(\d+)/add/', login_required(add_connection)),
-    url(r'^connections/(\d+)/edit/', login_required(edit_connection)),
-    url(r'^connections/(\d+)/delete/', login_required(delete_connection)),
-    url(r'^connections/(\d+)/view/', login_required(view_connections)),
+    url(r'^contacts/(\d+)/delete/', delete_contact),
+    url(r'^contacts/(\d+)/edit/', edit_contact),
+    url(r'^contacts/add/', add_contact),
+    url(r'^connections/(\d+)/add/', add_connection),
+    url(r'^connections/(\d+)/edit/', edit_connection),
+    url(r'^connections/(\d+)/delete/', delete_connection),
+    url(r'^connections/(\d+)/view/', view_connections),
 )

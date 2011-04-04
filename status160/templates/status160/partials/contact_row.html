@@ -48,12 +48,12 @@
     </td>
     <td class="button_col">
         {% if perms.auth.delete_user %}
-            <a href="javascript:void(0)" onclick="deleteContact(this, '{{ object.pk }}','{{ object.name }}')">
+            <a href="javascript:void(0)" onclick="deleteContact(this, '{% url status160.views.delete_contact object.pk %}','{{ object.name }}')">
                 <img src="{{ MEDIA_URL }}rapidsms/icons/silk/delete.png" />
             </a>
         {% endif %}
         {% if perms.auth.change_user %}
-            <a href="javascript:void(0)" onclick="editContact(this, '{{ object.pk }}')">
+            <a href="javascript:void(0)" onclick="editContact(this, '{% url status160.views.edit_contact object.pk %}')">
                 <img src="{{ MEDIA_URL }}poll/icons/silk/pencil.png" />
             </a>
         {% endif %}

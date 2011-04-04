@@ -16,6 +16,9 @@ import datetime
 from .utils import assign_backend
 from .forms import ConnectionForm, EditContactForm, NewContactForm
 from status160 import templatetags
+from django.conf import settings
+from urllib2 import urlopen
+from django.contrib.auth.decorators import login_required
 
 def index(request):
     return render_to_response("status160/index.html", {}, RequestContext(request)) 
@@ -27,12 +30,34 @@ def whitelist(request):
     mimetype="text/plain",
     context_instance=RequestContext(request))
 
+def _reload_whitelists():
+    refresh_urls = getattr(settings, 'REFRESH_WHITELIST_URL', None)
+    if refresh_urls is not None:
+        if not type(refresh_urls) == list:
+            refresh_urls = [refresh_urls,]
+        for refresh_url in refresh_urls:
+            try:
+                status_code = urlopen(refresh_url).getcode()
+                if int(status_code/100) == 2:
+                    continue
+                else:
+                    return False
+            except Exception as e:
+                return False
+        return True
+    return False
+
 @require_POST
+@login_required
 def delete_contact(request, contact_id):
     contact = get_object_or_404(Contact, pk=contact_id)
+    for conn in contact.connection_set.all():
+        conn.delete()
+    _reload_whitelists()
     contact.delete()
     return HttpResponse(status=200)
 
+@login_required
 def add_contact(request):
     form = NewContactForm()
     if request.method == 'POST':
@@ -65,10 +90,12 @@ def add_contact(request):
             if is_warden:
                 WardenRelationship.objects.create(warden=contact)
 
+            _reload_whitelists()
             return render_to_response('status160/partials/contact_row.html', {'object':contact, 'selectable':True}, RequestContext(request))
 
     return render_to_response("status160/partials/new_contact.html",{'form':form},RequestContext(request))
 
+@login_required
 def edit_contact(request, contact_id):
     contact = get_object_or_404(Contact, pk=contact_id)
     try:
@@ -105,7 +132,7 @@ def edit_contact(request, contact_id):
                 response.save()
                 response.categories.add(ResponseCategory.objects.create(response=response, is_override=True, user=request.user, category=status))
             contact.save()
-
+            _reload_whitelists()
             return render_to_response("status160/partials/contact_row.html", {'object':contact, 'selectable':True},RequestContext(request))
         else:
             return render_to_response("status160/partials/contact_row_edit.html", {'contact':contact, 'form':contact_form},context_instance=RequestContext(request))    
@@ -133,6 +160,7 @@ def edit_contact(request, contact_id):
         }, poll=poll, contact=contact)
         return render_to_response("status160/partials/contact_row_edit.html", {'contact':contact, 'form':contact_form},RequestContext(request))
 
+@login_required
 def edit_connection(request, connection_id):
     connection = get_object_or_404(Connection, pk=connection_id)
     if request.method == 'POST':
@@ -143,16 +171,20 @@ def edit_connection(request, connection_id):
             connection.identity = identity
             connection.backend = backend
             connection.save()
+            _reload_whitelists()
             return render_to_response("status160/partials/connection_view.html", {'object':connection.contact },context_instance=RequestContext(request))
     else:
         form = ConnectionForm({'identity':connection.identity})
     return render_to_response("status160/partials/connection_edit.html", {'contact':connection.contact, 'form':form, 'connection':connection},context_instance=RequestContext(request))
 
+@login_required
 def delete_connection(request, connection_id):
     connection = get_object_or_404(Connection, pk=connection_id)
     connection.delete()
+    _reload_whitelists()
     return render_to_response("status160/partials/connection_view.html", {'object':connection.contact },context_instance=RequestContext(request))
 
+@login_required
 def add_connection(request, contact_id):
     contact = get_object_or_404(Contact, pk=contact_id)
     if request.method == 'POST':
@@ -163,11 +195,13 @@ def add_connection(request, contact_id):
             connection, created = Connection.objects.get_or_create(identity=identity, backend=backend)
             connection.contact = contact
             connection.save()
+            _reload_whitelists()
             return render_to_response("status160/partials/connection_view.html", {'object':contact },context_instance=RequestContext(request))
     else:
         form = ConnectionForm()
     return render_to_response("status160/partials/connection_edit.html", {'contact':contact, 'form':form },context_instance=RequestContext(request))
 
+@login_required
 def view_connections(request, contact_id):
     contact = get_object_or_404(Contact, pk=contact_id)
     return render_to_response("status160/partials/connection_view.html", {'object':contact},context_instance=RequestContext(request))

@@ -1,9 +1,9 @@
 {% for connection in object.connection_set.all %}
     {% if perms.rapidsms.change_connection %}
         <span id="connection_span_{{ connection.pk }}">
-            <a href="javascript:void(0)" onclick="$('#connections_{{ object.pk }}_edit').load('../connections/{{ connection.pk }}/edit/')">{{ connection.identity }}</a>
+            <a href="javascript:void(0)" onclick="$('#connections_{{ object.pk }}_edit').load('{% url status160.views.edit_connection connection.pk %}')">{{ connection.identity }}</a>
             <img style="display:none;cursor:pointer;" border="0"
-                onclick="if (confirm('Are you sure you want to delete {{ connection.identity }}?')) { $('#connections_{{ object.pk }}').load('../connections/{{ connection.pk }}/delete/') }" src="{{ MEDIA_URL }}rapidsms/icons/silk/delete.png"
+                onclick="if (confirm('Are you sure you want to delete {{ connection.identity }}?')) { $('#connections_{{ object.pk }}').load('{% url status160.views.delete_connection connection.pk %}') }" src="{{ MEDIA_URL }}rapidsms/icons/silk/delete.png"
                 class="delete"/>
         </span>
         <script type="text/javascript">
@@ -22,7 +22,7 @@
     <br clear="left"/>
 {% endfor %}
 {% if perms.rapidsms.add_connection %}
-    <a class="small" href="javascript:void(0)" onclick="$('#connections_{{ object.pk }}_edit').load('../connections/{{ object.pk }}/add/')">add</a>
+    <a class="small" href="javascript:void(0)" onclick="$('#connections_{{ object.pk }}_edit').load('{% url status160.views.add_connection object.pk %}')">add</a>
 {% endif %}
 <div id="connections_{{ object.pk }}_edit">
 </div>
