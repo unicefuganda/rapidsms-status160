@@ -5,18 +5,45 @@ setup(
     version='0.1',
     license="BSD",
 
-    install_requires = ["rapidsms",
-                'django-eav',
-                'rapidsms-auth',
-                'rapidsms-polls',
-                'simple_locations'
-    ],
+    # install_requires = ["rapidsms",
+    #                 'django-eav',
+    #                 'rapidsms-auth',
+    #                 'rapidsms-polls',
+    #                 'simple_locations'
+    #     ],
+    # 
+    #     dependency_links = [
+    #         "http://github.com/mvpdev/django-eav/tarball/master#egg=django-eav",
+    #         "http://github.com/daveycrockett/auth/tarball/master#egg=rapidsms-auth",
+    #         "http://github.com/daveycrockett/rapidsms-polls/tarball/master#egg=rapidsms-polls",
+    #         "http://github.com/mossplix/simple_location/tarball/master#egg=simple_locations",
+    #     ],
 
+	install_requires = [
+        "rapidsms",
+        'rapidsms-xforms',
+        'rapidsms-auth',
+        'rapidsms-polls',
+        'rapidsms-httprouter',
+        'rapidsms-ureport',
+        'django-extensions',
+        'django-uni-form',
+        'django-eav',
+        'simple_locations',
+        'rapidsms-auth',
+        'rapidsms-authsites',
+    ],
+    
     dependency_links = [
-        "http://github.com/mvpdev/django-eav/tarball/master#egg=django-eav",
+        "http://github.com/daveycrockett/rapidsms-xforms/tarball/master#egg=rapidsms-xforms",
+        "http://github.com/mossplix/simple_locations/tarball/master#egg=simple_locations",
         "http://github.com/daveycrockett/auth/tarball/master#egg=rapidsms-auth",
         "http://github.com/daveycrockett/rapidsms-polls/tarball/master#egg=rapidsms-polls",
-        "http://github.com/mossplix/simple_location/tarball/master#egg=simple_locations",
+        "http://github.com/daveycrockett/rapidsms-httprouter/tarball/master#egg=rapidsms-httprouter",
+        "http://github.com/daveycrockett/rapidsms-ureport/tarball/master#egg=rapidsms-ureport",
+        "http://github.com/mvpdev/django-eav/tarball/master#egg=django-eav",
+        "http://github.com/daveycrockett/auth/tarball/master#egg=rapidsms-auth",
+        "http://github.com/daveycrockett/rapidsms-authsites/tarball/master#egg=rapidsms-authsites",
     ],
 
     description='An application for managing emergency situations, allowing admins to send out security surveys and assess a crisis situation.',
