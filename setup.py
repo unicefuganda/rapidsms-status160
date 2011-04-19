@@ -32,7 +32,7 @@ setup(
         'simple_locations',
         'rapidsms-auth',
         'rapidsms-authsites',
-		'rapidsms-generic',
+		# 'rapidsms-generic',
     ],
     
     dependency_links = [
@@ -45,7 +45,7 @@ setup(
         "http://github.com/mvpdev/django-eav/tarball/master#egg=django-eav",
         "http://github.com/daveycrockett/auth/tarball/master#egg=rapidsms-auth",
         "http://github.com/daveycrockett/rapidsms-authsites/tarball/master#egg=rapidsms-authsites",
-		"http://github.com/daveycrockett/rapidsms-generic/tarball/master#egg=rapidsms-generic",
+		# "http://github.com/daveycrockett/rapidsms-generic/tarball/master#egg=rapidsms-generic",
     ],
 
     description='An application for managing emergency situations, allowing admins to send out security surveys and assess a crisis situation.',

@@ -8,4 +8,3 @@
 -e git+http://github.com/mvpdev/django-eav.git#egg=django-eav
 -e git+http://github.com/daveycrockett/rapidsms-auth.git#egg=rapidsms-auth
 -e git+http://github.com/daveycrockett/rapidsms-authsites.git#egg=rapidsms-authsites
--e git+http://github.com/daveycrockett/rapidsms-generic.git#egg=rapidsms-generic
