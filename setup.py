@@ -22,30 +22,32 @@ setup(
 	install_requires = [
         "rapidsms",
         'rapidsms-xforms',
-        'rapidsms-auth',
+        'rapidsms-extauth',
         'rapidsms-polls',
         'rapidsms-httprouter',
         'rapidsms-ureport',
         'django-extensions',
         'django-uni-form',
         'django-eav',
-        'simple_locations',
+        'simple-locations',
         'rapidsms-auth',
         'rapidsms-authsites',
-		# 'rapidsms-generic',
+        'rapidsms-contact',
+		'rapidsms-generic',
     ],
     
     dependency_links = [
         "http://github.com/daveycrockett/rapidsms-xforms/tarball/master#egg=rapidsms-xforms",
-        "http://github.com/mossplix/simple_locations/tarball/master#egg=simple_locations",
+        "http://github.com/mossplix/simple_locations/tarball/master#egg=simple-locations",
         "http://github.com/daveycrockett/auth/tarball/master#egg=rapidsms-auth",
         "http://github.com/daveycrockett/rapidsms-polls/tarball/master#egg=rapidsms-polls",
         "http://github.com/daveycrockett/rapidsms-httprouter/tarball/master#egg=rapidsms-httprouter",
         "http://github.com/daveycrockett/rapidsms-ureport/tarball/master#egg=rapidsms-ureport",
         "http://github.com/mvpdev/django-eav/tarball/master#egg=django-eav",
-        "http://github.com/daveycrockett/auth/tarball/master#egg=rapidsms-auth",
+        "http://github.com/daveycrockett/auth/tarball/master#egg=rapidsms-extauth",
         "http://github.com/daveycrockett/rapidsms-authsites/tarball/master#egg=rapidsms-authsites",
-		# "http://github.com/daveycrockett/rapidsms-generic/tarball/master#egg=rapidsms-generic",
+		"http://github.com/mossplix/rapidsms-contact/tarball/master#egg=rapidsms-contact",
+        "http://github.com/daveycrockett/rapidsms-generic/tarball/master#egg=rapidsms-generic",
     ],
 
     description='An application for managing emergency situations, allowing admins to send out security surveys and assess a crisis situation.',
@@ -59,7 +61,7 @@ setup(
     include_package_data=True,
 
     packages=['status160'],
-
+    package_data={packages[0]:['templates/*/*.html','templates/*/*/*.html']},
     zip_safe=False,
     classifiers=[
         'Development Status :: 4 - Beta',
