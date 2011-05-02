@@ -21,7 +21,6 @@ setup(
 
 	install_requires = [
         "rapidsms",
-        'rapidsms-xforms',
         'rapidsms-extauth',
         'rapidsms-polls',
         'rapidsms-httprouter',
@@ -36,7 +35,6 @@ setup(
     ],
     
     dependency_links = [
-        "http://github.com/daveycrockett/rapidsms-xforms/tarball/master#egg=rapidsms-xforms",
         "http://github.com/mossplix/simple_locations/tarball/master#egg=simple-locations",
         "http://github.com/daveycrockett/auth/tarball/master#egg=rapidsms-auth",
         "http://github.com/daveycrockett/rapidsms-polls/tarball/master#egg=rapidsms-polls",
