@@ -53,7 +53,7 @@ setup(
     include_package_data=True,
 
     packages=['status160'],
-    package_data={'status160':['templates/*/*.html','templates/*/*/*.html','static/*','static/*/*']},
+    package_data={'status160':['templates/*/*.html','templates/*/*/*.html','static/*/*']},
     zip_safe=False,
     classifiers=[
         'Development Status :: 4 - Beta',
