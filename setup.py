@@ -30,6 +30,7 @@ setup(
         'simple-locations',
         'rapidsms-contact',
 		'rapidsms-generic',
+        'rapidsms-ureport',
     ],
     
     dependency_links = [
@@ -40,6 +41,7 @@ setup(
         "http://github.com/mvpdev/django-eav/tarball/master#egg=django-eav",
 		"http://github.com/mossplix/rapidsms-contact/tarball/master#egg=rapidsms-contact",
         "http://github.com/daveycrockett/rapidsms-generic/tarball/master#egg=rapidsms-generic",
+        "http://github.com/daveycrockett/rapidsms-ureport/tarball/master#egg=rapidsms-ureport",
     ],
 
     description='An application for managing emergency situations, allowing admins to send out security surveys and assess a crisis situation.',
