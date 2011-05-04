@@ -5,20 +5,6 @@ setup(
     version='0.1',
     license="BSD",
 
-    # install_requires = ["rapidsms",
-    #                 'django-eav',
-    #                 'rapidsms-auth',
-    #                 'rapidsms-polls',
-    #                 'simple_locations'
-    #     ],
-    # 
-    #     dependency_links = [
-    #         "http://github.com/mvpdev/django-eav/tarball/master#egg=django-eav",
-    #         "http://github.com/daveycrockett/auth/tarball/master#egg=rapidsms-auth",
-    #         "http://github.com/daveycrockett/rapidsms-polls/tarball/master#egg=rapidsms-polls",
-    #         "http://github.com/mossplix/simple_location/tarball/master#egg=simple_locations",
-    #     ],
-
 	install_requires = [
         "rapidsms",
         'django-extensions',
@@ -31,6 +17,7 @@ setup(
         'rapidsms-contact',
 		'rapidsms-generic',
         'rapidsms-ureport',
+        'uganda-common',
     ],
     
     dependency_links = [
@@ -42,6 +29,7 @@ setup(
 		"http://github.com/mossplix/rapidsms-contact/tarball/master#egg=rapidsms-contact",
         "http://github.com/daveycrockett/rapidsms-generic/tarball/master#egg=rapidsms-generic",
         "http://github.com/daveycrockett/rapidsms-ureport/tarball/master#egg=rapidsms-ureport",
+        "http://github.com/mossplix/uganda_common/tarball/master#egg=uganda-common",
     ],
 
     description='An application for managing emergency situations, allowing admins to send out security surveys and assess a crisis situation.',

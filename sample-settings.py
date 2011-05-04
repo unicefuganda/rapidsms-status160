@@ -6,7 +6,7 @@
 #                          MAIN CONFIGURATION                          #
 # -------------------------------------------------------------------- #
 TIME_ZONE="Africa/Kampala"
-BASE_CSS="/static/rapidsms/stylesheets/layout.css"
+
 # you should configure your database here before doing any real work.
 # see: http://docs.djangoproject.com/en/dev/ref/settings/#databases
 DATABASES = {
@@ -121,6 +121,7 @@ TEMPLATE_CONTEXT_PROCESSORS = [
     "django.core.context_processors.i18n",
     "django.core.context_processors.media",
     "django.core.context_processors.request",
+    "uganda_common.context_processors.layout",
 ]
 
 MIDDLEWARE_CLASSES = (
