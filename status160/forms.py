@@ -59,13 +59,9 @@ class CreateEventForm(ActionForm):
             description = self.cleaned_data['short_description']
             user = request.user
             question = self.cleaned_data['text_question']
-            poll = Poll.create_yesno(
-                 description,
-                 question,
-                 '',
-                 contacts,
-                 user
-            )
+            poll = Poll.objects.create(name=description,question=question,default_response=None,user=user)
+            poll.add_yesno_categories()
+
             poll.sites.add(Site.objects.get_current())
             yes_category = poll.categories.get(name='yes')
             yes_category.name = 'safe'
@@ -92,7 +88,8 @@ class CreateEventForm(ActionForm):
                 response='We have recorded but did not understand your response,please repeat (with a yes or no response)',
                 priority=3
             )
-            poll.start()
+            
+            poll.add_participants(contacts,True)
             return ("Event created, messages sent!", 'success',)
         else:
             return ("You don't have permission to create events!", 'error',)
