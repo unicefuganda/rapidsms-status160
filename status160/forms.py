@@ -1,7 +1,7 @@
 from django.conf import settings
 from django import forms
 from rapidsms.models import Contact, Connection, ConnectionBase
-from simple_locations.models import Area
+from rapidsms.contrib.locations.models import Location
 from poll.models import Poll, ResponseCategory, Response, Category
 from generic.forms import ActionForm, FilterForm
 from django.db.models import Q
@@ -42,7 +42,7 @@ class TeamFilterForm(FilterForm):
         return queryset.filter(groups__in=groups_pk)
 
 class OfficeFilterForm(FilterForm):
-    offices = forms.ModelMultipleChoiceField(queryset=Area.objects.filter(kind__name='Office').order_by('name'), label="Show locations:")    
+    offices = forms.ModelMultipleChoiceField(queryset=Location.objects.filter(type__name='Office').order_by('name'), label="Show locations:")    
 
     def filter(self, request, queryset):
         locations_pk = self.cleaned_data['offices']
@@ -156,7 +156,7 @@ class EditContactForm(forms.Form): # pragma: no cover
     warden = forms.ModelChoiceField(queryset=Contact.objects.filter(pk__in=WardenRelationship.objects.all().values_list('warden', flat=True)).order_by('name'), required=False)
     teams = forms.ModelMultipleChoiceField(queryset=Team.objects.all().order_by('name'), required=False)
     agencies = forms.ModelMultipleChoiceField(queryset=Agency.objects.all().order_by('name'), required=False)
-    location = forms.ModelChoiceField(queryset=Area.objects.filter(kind__name='Office'), required=False)
+    location = forms.ModelChoiceField(queryset=Location.objects.filter(type__name='Office'), required=False)
     comments = forms.CharField(max_length=2000, required=False, widget=forms.Textarea(attrs={'rows': 2}))
     
     def __init__(self, data=None, **kwargs):
@@ -184,7 +184,7 @@ class NewContactForm(forms.Form):
     warden = forms.ModelChoiceField(queryset=Contact.objects.filter(pk__in=WardenRelationship.objects.all().values_list('warden', flat=True)).order_by('name'), required=False)
     teams = forms.ModelMultipleChoiceField(queryset=Team.objects.all().order_by('name'), required=False)
     agencies = forms.ModelMultipleChoiceField(queryset=Agency.objects.all().order_by('name'), required=False)
-    location = forms.ModelChoiceField(queryset=Area.objects.filter(kind__name='Office'), required=False)
+    location = forms.ModelChoiceField(queryset=Location.objects.filter(type__name='Office'), required=False)
     identity = forms.CharField(max_length=15, required=True, label="Primary contact information")
     is_warden = forms.BooleanField(required=False, initial=False)
 

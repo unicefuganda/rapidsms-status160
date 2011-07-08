@@ -1,7 +1,6 @@
 from django.conf.urls.defaults import *
 from django.conf import settings
 from django.contrib import admin
-from simple_locations.urls import urlpatterns as location_urls
 from rapidsms_httprouter.urls import urlpatterns as router_urls
 admin.autodiscover()
 

@@ -9,7 +9,6 @@ from django.core.exceptions import ValidationError
 from django.http import HttpResponse
 from rapidsms.models import Contact, Connection
 from .models import WardenRelationship, Team, Agency, Alert, Comments
-from simple_locations.models import Area
 from poll.models import Poll, ResponseCategory, Response
 from rapidsms_httprouter.models import Message
 import datetime

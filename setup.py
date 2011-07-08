@@ -13,7 +13,6 @@ setup(
         'rapidsms-polls',
         'rapidsms-httprouter',
         'django-eav',
-        'simple-locations',
         'rapidsms-contact',
 		'rapidsms-generic',
         'rapidsms-ureport',
@@ -21,7 +20,6 @@ setup(
     ],
     
     dependency_links = [
-        "http://github.com/mossplix/simple_locations/tarball/master#egg=simple-locations",
         "http://github.com/daveycrockett/auth/tarball/master#egg=rapidsms-auth",
         "http://github.com/daveycrockett/rapidsms-polls/tarball/master#egg=rapidsms-polls",
         "http://github.com/daveycrockett/rapidsms-httprouter/tarball/master#egg=rapidsms-httprouter",

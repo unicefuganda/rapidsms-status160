@@ -49,8 +49,6 @@ INSTALLED_APPS = [
     "rapidsms.contrib.default",
     "rapidsms.contrib.registration",
     "eav",
-    "code_generator",
-    "simple_locations",
     "auth",
     "rapidsms_httprouter",
     "poll",
