@@ -12,10 +12,9 @@
 # know to look in the rapidsms package for commands yet.
 
 import sys
-import ureport.management.commands.startproject
 import django.core.management.commands.startproject
 
-sys.modules['django.core.management.commands.startproject'] =\
+sys.modules['django.core.management.commands.startproject'] = \
     status160.management.commands.startproject
 
 

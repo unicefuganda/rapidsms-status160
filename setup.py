@@ -5,7 +5,7 @@ setup(
     version='0.1',
     license="BSD",
 
-	install_requires = [
+	install_requires=[
         "rapidsms",
         'django-extensions',
         'django-uni-form',
@@ -15,18 +15,16 @@ setup(
         'django-eav',
         'rapidsms-contact',
 		'rapidsms-generic',
-        'rapidsms-ureport',
         'uganda-common',
     ],
-    
-    dependency_links = [
+
+    dependency_links=[
         "http://github.com/daveycrockett/auth/tarball/master#egg=rapidsms-auth",
         "http://github.com/daveycrockett/rapidsms-polls/tarball/master#egg=rapidsms-polls",
         "http://github.com/daveycrockett/rapidsms-httprouter/tarball/master#egg=rapidsms-httprouter",
         "http://github.com/mvpdev/django-eav/tarball/master#egg=django-eav",
 		"http://github.com/mossplix/rapidsms-contact/tarball/master#egg=rapidsms-contact",
         "http://github.com/daveycr1ockett/rapidsms-generic/tarball/master#egg=rapidsms-generic",
-        "http://github.com/daveycrockett/rapidsms-ureport/tarball/master#egg=rapidsms-ureport",
         "http://github.com/mossplix/uganda_common/tarball/master#egg=uganda-common",
     ],
 
@@ -41,7 +39,7 @@ setup(
     include_package_data=True,
 
     packages=['status160'],
-    package_data={'status160':['templates/*/*.html','templates/*/*/*.html','static/*/*']},
+    package_data={'status160':['templates/*/*.html', 'templates/*/*/*.html', 'static/*/*']},
     zip_safe=False,
     classifiers=[
         'Development Status :: 4 - Beta',
